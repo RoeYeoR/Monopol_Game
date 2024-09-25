@@ -8,7 +8,8 @@
 #include "CommunityChest.hpp"
 #include "Point2D.hpp"
 #include "MonopolManager.hpp"
-using namespace std;
+
+
 
 class Player{
 

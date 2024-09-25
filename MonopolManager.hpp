@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include "Board.hpp"
-#include "Player.hpp"
 #include "Chance.hpp"
 #include "Square.hpp" 
 #include "Tax.hpp" 
@@ -11,6 +10,9 @@
 #include "EdgeSquare.hpp" 
 #include <ctime> 
 #include <cstdlib>  // For rand() and srand()
+#include "Player.hpp"
+
+class Player;  // Forward declaration
 
 
 using namespace std;

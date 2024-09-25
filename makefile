@@ -6,6 +6,7 @@
 # link:
 # 	g++ main.o -o main -L"C:\Users\Roi\Documents\Libraries\SFML-2.6.1\lib" -lsfml-graphics-s -lsfml-window-s -lsfml-system-s -lopengl32 -lfreetype -lwinmm -lgdi32 -mwindows
 
+all: monopol
 # Compiler
 CXX = g++
 CXXFLAGS = -std=c++14 -Wall -g  # Use C++14, enable all warnings, and debug info
@@ -50,8 +51,8 @@ HEADERS = \
     WaterCompany.hpp
 
 # Default rule to build the target
-$(TARGET): $(OBJ)
-	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJ)
+monopol: $(OBJ)
+	$(CXX) $(CXXFLAGS) -o monopol $(OBJ)
 
 # Rule to compile .cpp files to .o files
 %.o: %.cpp $(HEADERS)
@@ -59,4 +60,4 @@ $(TARGET): $(OBJ)
 
 # Clean rule to remove generated files
 clean:
-	rm -f $(OBJ) $(TARGET)
+	rm -f $(OBJ) monopol

@@ -114,5 +114,12 @@
     "typeinfo": "cpp",
     "variant": "cpp"
   },
-  "makefile.buildLog": ""
+  "makefile.buildLog": "",
+  "makefile.launchConfigurations": [
+    {
+      "cwd": "c:\\Users\\Roi\\Desktop\\ComputerScience\\YearB\\SemesterB\\Systems2\\Systems2_FinalProject",
+      "binaryPath": "c:\\Users\\Roi\\Desktop\\ComputerScience\\YearB\\SemesterB\\Systems2\\Systems2_FinalProject\\monopol",
+      "binaryArgs": []
+    }
+  ]
 }

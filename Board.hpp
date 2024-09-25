@@ -4,7 +4,6 @@
 #include <vector>
 #include <memory>  // For std::shared_ptr
 #include "Point2D.hpp"
-#include "Player.hpp"
 #include "Street.hpp"
 #include "Chance.hpp"
 #include "CommunityChest.hpp"
@@ -14,6 +13,8 @@
 #include "ElectricCompany.hpp"
 #include "Square.hpp"
 #include "EdgeSquare.hpp"
+
+class Player;  // Forward declaration
 
 class Board {
   private:
