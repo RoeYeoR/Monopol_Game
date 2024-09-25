@@ -1,0 +1,245 @@
+#include "MonopolManager.hpp"
+
+
+
+
+MonopolManager::MonopolManager() 
+{
+    chanceStrings.push_back("Advance to Go (Collect $200)");
+    chanceStrings.push_back("Bank pays you dividend of $50");
+    chanceStrings.push_back("Go back 3 spaces");
+    chanceStrings.push_back("Go directly to Jail do not pass Go, do not collect $200");
+    chanceStrings.push_back("Make general repairs on all your property  For each house pay $25  For each hotel $100");
+    chanceStrings.push_back("Pay poor tax of $15");
+    chanceStrings.push_back("Take a trip to Reading Railroad  If you pass Go collect $200");
+    chanceStrings.push_back("Take a walk on the Boardwalk  Advance token to Boardwalk");
+    chanceStrings.push_back("You have been elected Chairman of the Board  Pay each player $50");
+    chanceStrings.push_back("Your building loan matures  Collect $150");
+    chanceStrings.push_back("Get out of Jail Free  This card may be kept until needed or traded");
+    chanceStrings.push_back("Advance to Illinois Ave.  If you pass Go, collect $200");
+    chanceStrings.push_back("Advance to St. Charles Place  If you pass Go, collect $200");
+    chanceStrings.push_back("You are assessed for street repairs  $40 per house, $115 per hotel");
+    chanceStrings.push_back("Advance to nearest Utility  If unowned you may buy it from the Bank. If owned, throw dice and pay owner a total ten times the amount thrown.");
+    chanceStrings.push_back("Advance to nearest Railroad. If unowned, you may buy it from the Bank. If owned, pay owner twice the rental to which they are otherwise entitled");
+
+
+    for(int i=0; i <chanceStrings.size(); i++)
+    {
+        Chance c(chanceStrings[i]);
+        chanceCards.push_back(c);
+    }
+                    
+
+}
+
+
+std::vector<std::shared_ptr<Player>>&  MonopolManager::getPlayers()
+{
+    return players;
+}
+
+
+std::shared_ptr<Player>& MonopolManager::getCurrentPlayer()
+ {
+
+    return currentPlayer;
+ }
+ 
+void MonopolManager::setCurrentPlayer(std::shared_ptr<Player> p)
+{
+    currentPlayer = p;
+}
+
+ std::vector<Chance>& MonopolManager::getChanceCards()
+ {
+    return chanceCards;
+
+ }
+
+int MonopolManager::RollDice()
+{
+    std::srand(static_cast<unsigned int>(std::time(0)));
+    int dice1 = (std::rand() % 6) + 1;
+    int dice2 = (std::rand() % 6) + 1;
+    return (dice1+dice2);
+}
+
+const std::shared_ptr<Player>* MonopolManager::CheckStreetOwner(const std::shared_ptr<Square>& square)
+{
+    // Attempt to dynamic cast the Square to a Street
+    Street* street = dynamic_cast<Street*>(square.get());
+    if (!street) {
+        throw std::runtime_error("The square is not a street.");
+    }
+
+    for (const std::shared_ptr<Player>& p : players)
+    {
+       if(p != currentPlayer)
+       {
+           for (const Street& st : p->getStreets())
+           {
+              if (st == *street)
+              {
+                return &p;
+              }  
+           }
+       }     
+    }
+
+    return nullptr;
+}
+
+const std::shared_ptr<Player>* MonopolManager::CheckTrainOwner(const std::shared_ptr<Square>& square)
+{
+    Train* train = dynamic_cast<Train*>(square.get());
+    if (!train) {
+        throw std::runtime_error("The square is not a train.");
+    }
+    for(const std::shared_ptr<Player>& p : players)
+    {
+        if( p != currentPlayer)
+        {
+            for(const Train& tr : p->getTrains())
+            {
+                if(tr == *train)
+                {
+                    return &p;
+                }
+
+            }
+        }
+    }
+    return nullptr;
+    
+}
+
+const std::shared_ptr<Player>* MonopolManager::CheckWaterCompanyOwner(const std::shared_ptr<Square>& square)
+{
+    for(const std::shared_ptr<Player>& p : players)
+    {
+        if(p != currentPlayer)
+        {
+            if(p->gethasOwnWaterCompany())
+                    return &p;
+        }
+    }
+    return nullptr;
+
+}
+
+const std::shared_ptr<Player>* MonopolManager::CheckElectricCompanyOwner(const std::shared_ptr<Square>& square)
+{
+    for(const std::shared_ptr<Player>& p : players)
+    {
+        if( p != currentPlayer)
+        {
+            if(p->gethasOwnElectricCompany())
+                    return &p;
+        }
+    }
+    return nullptr;
+
+}
+
+void MonopolManager::CheckTaxPrice(Tax* tax)
+{
+    std::cout << "You need to pay  " << tax->getPrice() << "to the bank" << std::endl;
+    std::cout << "current money:  " << currentPlayer->getMoney()<< std::endl;
+    currentPlayer->setMoney(currentPlayer->getMoney() - tax->getPrice());
+    std::cout << "Charging your money...  " <<"/n" <<" money remained after charge: "<< currentPlayer->getMoney()<< std::endl;
+}
+
+ void MonopolManager::AddChance()
+ {
+    if(currentPlayer->AddChance())
+    {
+        std::cout<<"A chance card was added succesfully!" << std::endl;
+    }
+    else{
+         std::cout<<"couldn't add a chance card..." << std::endl;
+    }
+
+ }
+
+ void MonopolManager::AddCommunityChest()
+ {
+
+
+ }
+
+
+ void MonopolManager::BuyStreet(Street* street)
+ {
+    int ans;
+    street->display(std::cout);
+    currentPlayer->displayShort(std::cout);
+    if(currentPlayer->getMoney() < street->getPrice())
+    {
+        std::cout << "You don't have enough money..." <<std::endl;
+    }
+
+    else
+    {
+        std::cout << "Do you want to buy this street? 1.Yes , 2.No" <<std::endl;
+        std::cin >> ans; 
+        if(ans ==1)
+        {
+            if(currentPlayer->PurchaseStreet(street))
+            {
+                std::cout<<"Street: "<< street->name << "was purchased succesfully" <<std::endl;
+                currentPlayer->displayLong(std::cout);
+            }
+        }
+       
+    }
+   
+
+ }
+
+  void MonopolManager::BuyTrain(Train* train)
+ {
+    int ans;
+    train->display(std::cout);
+    currentPlayer->displayShort(std::cout);
+    if(currentPlayer->getMoney() < train->getPrice())
+    {
+        std::cout << "You don't have enough money..." <<std::endl;
+    }
+
+    else
+    {
+        std::cout << "Do you want to buy this train? 1.Yes , 2.No" <<std::endl;
+        std::cin >> ans; 
+        if(ans ==1)
+        {
+            if(currentPlayer->PurchaseTrain(train))
+            {
+                std::cout<<"Train: "<< train->name << "was purchased succesfully" <<std::endl;
+                currentPlayer->displayLong(std::cout);
+            }
+        }
+       
+    }
+    
+ }
+
+
+  void MonopolManager::BuyWaterCompany(WaterCompany* waterCompany)
+ {
+
+    
+ }
+
+
+  void MonopolManager::BuyElectricCompanyOwner(ElectricCompany* electricCompany)
+ {
+
+    
+ }
+
+ 
+  void MonopolManager::CheckEdgeSquare(EdgeSquare* edgeSquare)
+ {
+
+    
+ }

@@ -1,0 +1,16 @@
+#pragma once
+
+#include <iostream>
+#include "Square.hpp"
+
+class Chance :public Square {
+    private:
+    bool wasInUse;
+
+    public:
+        Chance();
+        Chance(std::string name);
+        bool getWasInUse();
+        void display(std::ostream& os) const override;
+
+};
