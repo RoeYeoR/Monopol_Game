@@ -71,9 +71,9 @@ std::vector<std::vector<std::shared_ptr<Square>>>& Board::getBoard()
 }
 
 
-const std::shared_ptr<Player>* Board::checkSquareOwnerShip(const std::shared_ptr<Square>& square) {
+ std::shared_ptr<Player>* Board::checkSquareOwnerShip(const std::shared_ptr<Square>& square) {
     
-    const std::shared_ptr<Player>* p =nullptr;
+    std::shared_ptr<Player>* p =nullptr;
 
     if (dynamic_cast<Street*>(square.get())) {
      
@@ -137,4 +137,15 @@ void Board::offerPlayerOptions(const std::shared_ptr<Square>& square)
     }
 
 
+}
+
+void Board::offerPlayerUpgrades(const std::shared_ptr<Square>& square)
+{
+    if (auto street = dynamic_cast<Street*>(square.get())) {
+        std::cout << "This Street belongs to you." << std::endl;
+        MonopolManager::getInstance().UpgradeStreet(street);
+    } 
+     else {
+        std::cout << "This Square can not be Upgraded." << std::endl;
+    }
 }

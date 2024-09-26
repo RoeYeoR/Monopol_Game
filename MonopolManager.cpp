@@ -24,7 +24,7 @@ MonopolManager::MonopolManager()
     for(int i=0; i <chanceStrings.size(); i++)
     {
         Chance c(chanceStrings[i]);
-        chanceCards.push_back(c);
+        gameChanceCards.push_back(c);
     }
                     
  
@@ -49,10 +49,9 @@ void MonopolManager::setCurrentPlayer(std::shared_ptr<Player>& p)
     currentPlayer = p;
 }
 
- std::vector<Chance>& MonopolManager::getChanceCards()
+ std::vector<Chance>& MonopolManager::getGameChanceCards()
  {
-    return chanceCards;
-
+    return gameChanceCards;
  }
 
 int MonopolManager::RollDice()
@@ -63,7 +62,7 @@ int MonopolManager::RollDice()
     return (dice1+dice2);
 }
 
-const std::shared_ptr<Player>* MonopolManager::CheckStreetOwner(const std::shared_ptr<Square>& square)
+std::shared_ptr<Player>* MonopolManager::CheckStreetOwner(const std::shared_ptr<Square>& square)
 {
     // Attempt to dynamic cast the Square to a Street
     Street* street = dynamic_cast<Street*>(square.get());
@@ -71,7 +70,7 @@ const std::shared_ptr<Player>* MonopolManager::CheckStreetOwner(const std::share
         throw std::runtime_error("The square is not a street.");
     }
 
-    for (const std::shared_ptr<Player>& p : players)
+    for ( std::shared_ptr<Player>& p : players)
     {
        if(p != currentPlayer)
        {
@@ -87,13 +86,13 @@ const std::shared_ptr<Player>* MonopolManager::CheckStreetOwner(const std::share
     return nullptr;
 }
 
-const std::shared_ptr<Player>* MonopolManager::CheckTrainOwner(const std::shared_ptr<Square>& square)
+ std::shared_ptr<Player>* MonopolManager::CheckTrainOwner(const std::shared_ptr<Square>& square)
 {
     Train* train = dynamic_cast<Train*>(square.get());
     if (!train) {
         throw std::runtime_error("The square is not a train.");
     }
-    for(const std::shared_ptr<Player>& p : players)
+    for( std::shared_ptr<Player>& p : players)
     {
         if( p != currentPlayer)
         {
@@ -110,9 +109,9 @@ const std::shared_ptr<Player>* MonopolManager::CheckTrainOwner(const std::shared
     return nullptr;
 }
 
-const std::shared_ptr<Player>* MonopolManager::CheckWaterCompanyOwner(const std::shared_ptr<Square>& square)
+ std::shared_ptr<Player>* MonopolManager::CheckWaterCompanyOwner(const std::shared_ptr<Square>& square)
 {
-    for(const std::shared_ptr<Player>& p : players)
+    for( std::shared_ptr<Player>& p : players)
     {
         if(p != currentPlayer)
         {
@@ -123,10 +122,9 @@ const std::shared_ptr<Player>* MonopolManager::CheckWaterCompanyOwner(const std:
     return nullptr;
 
 }
-
-const std::shared_ptr<Player>* MonopolManager::CheckElectricCompanyOwner(const std::shared_ptr<Square>& square)
+ std::shared_ptr<Player>* MonopolManager::CheckElectricCompanyOwner(const std::shared_ptr<Square>& square)
 {
-    for(const std::shared_ptr<Player>& p : players)
+    for( std::shared_ptr<Player>& p : players)
     {
         if( p != currentPlayer)
         {
@@ -142,6 +140,14 @@ void MonopolManager::CheckTaxPrice(Tax* tax)
 {
     std::cout << "You need to pay  " << tax->getPrice() << " to the bank" << std::endl;
     std::cout << "current money:  " << currentPlayer->getMoney()<< std::endl;
+    if(currentPlayer->getMoney() < tax->getPrice())
+    {
+        std::cout<<"You don't have enouge money to pay for the bank. deleting your properties ..."<<std::endl;
+        if(DeleteAllProperties())
+        {
+            std::cout<< currentPlayer->getName() << " went bankrupt and finished the Game !...! " <<std::endl;
+        }
+    }
     currentPlayer->setMoney(currentPlayer->getMoney() - tax->getPrice());
     std::cout << "Charging your money...  " << std::endl <<" money remained after charge: "<< currentPlayer->getMoney()<< std::endl;
 }
@@ -164,6 +170,51 @@ void MonopolManager::CheckTaxPrice(Tax* tax)
 
  }
 
+ float MonopolManager::getActuallBillOfSquare(std::shared_ptr<Square>& square,std::shared_ptr<Player>* ownPlayer)
+ {
+    float price;
+    if(auto street = dynamic_cast<Street*>(square.get()))
+    {
+        if(street->getNumOfHouses()>0 && street->getHasHotel() == false)
+        {
+            price = street->getRentPriceWithHouse() * pow(2,street->getNumOfHouses()-1);
+        }
+        else if(street->getHasHotel())
+        {
+           price = street->getRentPriceWithHotel();
+        }
+        else
+        {
+            price = street->getRentPrice();
+        }
+      
+    }
+
+    else if(auto train = dynamic_cast<Train*>(square.get()))
+    {
+        switch((*ownPlayer)->getTrains().size()>0)
+        {
+           case 1:
+            price = 50;
+            break;
+
+           case 2:
+            price =100;
+             break;
+
+            case 3:
+            price = 150;
+             break;
+
+            case 4:
+            price =200; 
+             break;
+        }
+    }
+
+    return price;
+
+ }
 
  void MonopolManager::BuyStreet(Street* street)
  {
@@ -186,10 +237,8 @@ void MonopolManager::CheckTaxPrice(Tax* tax)
                 std::cout<<"Street: "<< street->name << " was purchased succesfully" <<std::endl;
                 currentPlayer->displayLong(std::cout);
             }
-        }
-       
+        }      
     }
-   
  }
 
   void MonopolManager::BuyTrain(Train* train)
@@ -201,13 +250,17 @@ void MonopolManager::CheckTaxPrice(Tax* tax)
     {
         std::cout << "You don't have enough money to buy this train..." <<std::endl;
     }
-
     else
     {
         std::cout << "Do you want to buy this train? 1.Yes , 2.No" <<std::endl;
         std::cin >> ans; 
         if(ans ==1)
         {
+            if(Train::count >= 4)
+            {
+                std::cout<< "All 4 trains were already sold !" <<std::endl;
+                return;
+            }
             if(currentPlayer->PurchaseTrain(train))
             {
                 std::cout<<"Train: "<< train->name << " was purchased succesfully" <<std::endl;
@@ -247,7 +300,6 @@ void MonopolManager::CheckTaxPrice(Tax* tax)
 
  }
 
-
   void MonopolManager::BuyElectricCompanyOwner(ElectricCompany* electricCompany)
  {
     int ans;
@@ -257,7 +309,6 @@ void MonopolManager::CheckTaxPrice(Tax* tax)
     {
         std::cout << "You don't have enough money to buy the Water Company..." <<std::endl;
     }
-
     else
     {
         std::cout << "Do you want to buy the Water Company? 1.Yes , 2.No" <<std::endl;
@@ -269,12 +320,10 @@ void MonopolManager::CheckTaxPrice(Tax* tax)
                 std::cout<< electricCompany->name << " was purchased succesfully" <<std::endl;
                 currentPlayer->displayLong(std::cout);
             }
-        }
-       
+        }       
     }
     
  }
-
  
   void MonopolManager::CheckEdgeSquare(EdgeSquare* edgeSquare)
  {
@@ -299,9 +348,119 @@ void MonopolManager::CheckTaxPrice(Tax* tax)
     
  }
 
+
+void MonopolManager::UpgradeStreet(Street* street)
+{
+    std::cout << "Current number of houses on this street: " << street->getNumOfHouses() <<std::endl;
+    if(street->getNumOfHouses() <4)
+    {
+        int ans1;
+        std::cout << "would you like to upgrade and purchase another house on this street? 1.Yes , 2. No" << std::endl;
+        std::cin >> ans1;
+        if(ans1==1)
+        {
+            currentPlayer->PurchaseHouse(street);
+
+        }
+    }
+    else
+    {
+        if(!street->getHasHotel())
+        {
+        int ans2;
+        std::cout << "would you like to upgrade and purchase an hotel on this street?" << std::endl;
+        std::cin >> ans2;
+        if(ans2 ==1)
+        {
+            currentPlayer->PurchaseHotel(street);
+
+        }
+        }
+    
+    }
+
+}
+
+ bool MonopolManager::ChargePlayer(std::shared_ptr<Player>& src,std::shared_ptr<Player>& dst,float amount)
+ {
+    bool isValidTransfer = true;
+    std::cout << "Transfer: " <<  amount  <<"₪ From "<< src->getName() << " To "<< dst->getName() << std::endl;
+    std::cout << "Charging ..." << std::endl;
+    if(src->getMoney() < amount)
+    {
+        src->setIsBankrupt(true);
+        TransferAllProperties(src,dst);
+        isValidTransfer =false;
+    }
+    else
+    {
+        src->changeMoney(-amount);
+        dst->changeMoney(amount);
+    }
+
+    return isValidTransfer;
+
+ }
+
+ void MonopolManager::TransferAllProperties(std::shared_ptr<Player>& src,std::shared_ptr<Player>& dst)
+ {
+    if(src->getStreets().size() > 0)
+    {
+        for (int i = 0; i < src->getStreets().size(); i++)
+        {
+           dst->getStreets().push_back(src->getStreets()[i]);
+        }
+        
+        src->getStreets().clear();
+    }
+    if(src->getTrains().size() > 0)
+    {
+        for (int i = 0; i < src->getTrains().size(); i++)
+        {
+           dst->getTrains().push_back(src->getTrains()[i]);
+        }  
+
+        src->getTrains().clear();
+    }
+    if(src->gethasOwnWaterCompany())
+    {
+        src->setHasOwnWaterCompany(false);
+        dst->setHasOwnWaterCompany(true);
+    }
+
+     if(src->gethasOwnElectricCompany())
+    {
+        src->setHasOwnElectricCompany(false);
+        dst->setHasOwnElectricCompany(true);
+    }
+
+    if(src->getChanceCards().size() > 0)
+    {
+        for (int i = 0; i < src->getChanceCards().size(); i++)
+        {
+           dst->getChanceCards().push_back(src->getChanceCards()[i]);
+        }
+          
+    }
+
+    dst->changeMoney(src->getMoney());
+    src->setMoney(0);
+ }
+
+ bool MonopolManager::DeleteAllProperties()
+ {
+    currentPlayer->getStreets().clear();
+    currentPlayer->getTrains().clear();
+    currentPlayer->getChanceCards().clear();
+    currentPlayer->setHasOwnElectricCompany(false);
+    currentPlayer->setHasOwnWaterCompany(false);
+    currentPlayer->setMoney(0);
+    return true;
+ }
+
  void MonopolManager::GrantPlayerMoney(float sum)
  {
-    currentPlayer->addMoney(sum);
+    currentPlayer->changeMoney(sum);
  }
 
  void MonopolManager::GoToJail()
@@ -309,9 +468,7 @@ void MonopolManager::CheckTaxPrice(Tax* tax)
     currentPlayer->setIsInJail(true);
     Point2D jailSquare(0,10);
     currentPlayer->GoToSquare(jailSquare);
-
  }
-
 
  std::shared_ptr<Player>* MonopolManager::CheckIsWinner()
  {
@@ -329,7 +486,6 @@ void MonopolManager::CheckTaxPrice(Tax* tax)
     }
     return nullptr;
  }
-
 
  bool MonopolManager::areAllRestPlayersHaveBankRupt(std::shared_ptr<Player>& p)
  {

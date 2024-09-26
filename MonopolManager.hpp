@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <cmath>
 #include "Board.hpp"
 #include "Chance.hpp"
 #include "Square.hpp" 
@@ -22,7 +23,7 @@ class MonopolManager{
     private:
         //Board board; 
         std::vector<std::shared_ptr<Player>> players;
-        std::vector<Chance> chanceCards;
+        std::vector<Chance> gameChanceCards;
         std::vector<std::string> chanceStrings;
         std::shared_ptr<Player> currentPlayer; 
        
@@ -44,21 +45,25 @@ class MonopolManager{
         std::vector<std::shared_ptr<Player>>& getPlayers();
         std::shared_ptr<Player>& getCurrentPlayer();
         void setCurrentPlayer(std::shared_ptr<Player>& p);
-        std::vector<Chance>& getChanceCards();
+        std::vector<Chance>& getGameChanceCards();
         int RollDice();
-        const std::shared_ptr<Player>* CheckStreetOwner(const std::shared_ptr<Square>& square);
-        const std::shared_ptr<Player>* CheckTrainOwner(const std::shared_ptr<Square>& square);
-        const std::shared_ptr<Player>* CheckWaterCompanyOwner(const std::shared_ptr<Square>& square);
-        const std::shared_ptr<Player>* CheckElectricCompanyOwner(const std::shared_ptr<Square>& square);
+        std::shared_ptr<Player>* CheckStreetOwner(const std::shared_ptr<Square>& square);
+        std::shared_ptr<Player>* CheckTrainOwner(const std::shared_ptr<Square>& square);
+        std::shared_ptr<Player>* CheckWaterCompanyOwner(const std::shared_ptr<Square>& square);
+        std::shared_ptr<Player>* CheckElectricCompanyOwner(const std::shared_ptr<Square>& square);
         void CheckTaxPrice(Tax* tax);
         void AddChance();
         void AddCommunityChest();
-        
+        float getActuallBillOfSquare(std::shared_ptr<Square>& square,std::shared_ptr<Player>* ownPlayer);
         void BuyStreet(Street* street);
         void BuyTrain(Train* train);
         void BuyWaterCompany(WaterCompany* waterCompany);
         void BuyElectricCompanyOwner(ElectricCompany* electricCompany);
+        void UpgradeStreet(Street* street);
         void CheckEdgeSquare(EdgeSquare* edgeSquare);
+        bool ChargePlayer(std::shared_ptr<Player>& src,std::shared_ptr<Player>& dst, float amount);
+        void TransferAllProperties(std::shared_ptr<Player>& src,std::shared_ptr<Player>& dst);
+        bool DeleteAllProperties();
         void GoToJail();
         void GrantPlayerMoney(float sum);
         bool areAllRestPlayersHaveBankRupt(std::shared_ptr<Player>& p);

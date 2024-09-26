@@ -38,7 +38,8 @@ class Board {
     void setSquare(int row, int col, std::shared_ptr<Square> square);
     std::vector<std::vector<std::shared_ptr<Square>>>& getBoard();
 
-    const std::shared_ptr<Player>* checkSquareOwnerShip(const std::shared_ptr<Square>& square);
+    std::shared_ptr<Player>* checkSquareOwnerShip(const std::shared_ptr<Square>& square);
     void offerPlayerOptions(const std::shared_ptr<Square>& square);
+    void offerPlayerUpgrades(const std::shared_ptr<Square>& square);
 
 };

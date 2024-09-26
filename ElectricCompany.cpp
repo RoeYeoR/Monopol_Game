@@ -1,13 +1,8 @@
 #include "ElectricCompany.hpp"
 
-ElectricCompany::ElectricCompany() :Square("Default Electric Square") ,price(150) {}
+ElectricCompany::ElectricCompany() :Square("Default Electric Square",150) {}
 
-ElectricCompany::ElectricCompany(std::string name) : Square(name) ,price(150) {}
-
-float ElectricCompany::getPrice()
-{
-    return price;
-}
+ElectricCompany::ElectricCompany(std::string name) : Square(name,150) {}
 
 void ElectricCompany::display(std::ostream& os) const
 {

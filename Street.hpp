@@ -10,30 +10,27 @@ using namespace std;
 class Street : public Square{
 
 private:
-   
-    float price;
     float rentPrice;
     float housePrice;
     float rentPriceWithHouse;
     float rentPriceWithHotel;
 
-    int numfHouses;
+    int numOfHouses;
     bool hasHotel;
     Color color;
 
 public:
     Street(std::string name,float price,Color color,float housePrice);
      // Override display method
-   
-    float getPrice();
     float getRentPrice();
     float getHousePrice();
     float getRentPriceWithHouse();
     float getRentPriceWithHotel();
-    int getNumfHouses();
+    int getNumOfHouses();
     bool getHasHotel();
     Color getColor();
-
+    void addHouse();
+    void addHotel();
     void display(std::ostream& os) const override;
 
        

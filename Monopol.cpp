@@ -58,17 +58,34 @@ int main ()
     
     (actuallBoard[newPos.getX()][newPos.getY()]->display(std::cout));
     
-    const std::shared_ptr<Player>* p = board.checkSquareOwnerShip(actuallBoard[newPos.getX()][newPos.getY()]);
+    
+    std::shared_ptr<Player>* p = board.checkSquareOwnerShip(actuallBoard[newPos.getX()][newPos.getY()]);
     if( p == nullptr)
     {      
         board.offerPlayerOptions(actuallBoard[newPos.getX()][newPos.getY()]);
     }
+    else if( *p != currentPlayer)
+    {
+        std::shared_ptr<Square>& currentSquare =  actuallBoard[newPos.getX()][newPos.getY()];
+        currentSquare->display(std::cout);
+        std::cout <<"This Sqaure is owned by " << (*p)->getName();
+        float calculatedPrice = MonopolManager::getInstance().getActuallBillOfSquare(currentSquare,p);  
+      
+       if(!MonopolManager::getInstance().ChargePlayer(currentPlayer,*p,calculatedPrice))
+       {
+           std::cout<< currentPlayer->getName() <<" went bankrupt ..." <<std::endl << "All it's properties were passed to " 
+           << (*p)->getName() <<std::endl;
+       }
+       else
+       {
+             std::cout << "Transfer of " << currentSquare->getPrice() <<"₪ was done Successfully!"<<std::endl;
+       }
+    }
     else
     {
-       actuallBoard[newPos.getX()][newPos.getY()]->display(std::cout);
-       std::cout <<"This Sqaure is owned by " << (*p)->getName();
-    }
+        board.offerPlayerUpgrades(actuallBoard[newPos.getX()][newPos.getY()]);
 
+    }
         winner = MonopolManager::getInstance().CheckIsWinner();
         i++;
         i = (i % numOfPlayers);
