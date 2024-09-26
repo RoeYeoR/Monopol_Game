@@ -22,13 +22,22 @@ class Player{
         std::vector<Train> trains;
         std::vector<Chance> ChanceCards;
         std::vector<CommunityChest> CommunityChestCards;
+        std::vector<int> diceResults;
+        int countTurns;
+        bool isInJail;
+        bool isBankrupt; // don't have enough money to pay his bills
 
     public:
         Player(std::string name); 
         void MoveOnBoard(int diceResult);  
+        void GoToSquare(Point2D& p);
         std::string getName();
         float getMoney();
-        float setMoney(float newMoney);
+        bool getIsInJail();
+        bool getIsBankrupt();
+        void addMoney(float newMoney);
+        void setMoney(float newMoney);
+        void setIsInJail(bool var);
         Point2D& getCurrentPosition();
         const std::vector<Street>& getStreets() const;
         const std::vector<Train>& getTrains() const;
@@ -38,6 +47,8 @@ class Player{
         bool AddChance();
         bool PurchaseStreet(Street* street);
         bool PurchaseTrain(Train* train);
+        bool PurchaseWaterCompany(WaterCompany* waterCompany);
+        bool PurchaseElectricCompany(ElectricCompany* electricCompany);
         void displayShort(std::ostream& os) const;
         void displayLong(std::ostream& os) const;
 };

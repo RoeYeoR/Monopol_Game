@@ -12,6 +12,7 @@ class ElectricCompany :public Square {
     public:
         ElectricCompany();
         ElectricCompany(std::string name);
+        float getPrice();
         void display(std::ostream& os) const override;
 
 };

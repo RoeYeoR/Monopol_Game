@@ -25,6 +25,7 @@ class MonopolManager{
         std::vector<Chance> chanceCards;
         std::vector<std::string> chanceStrings;
         std::shared_ptr<Player> currentPlayer; 
+       
         MonopolManager();
 
     public:
@@ -38,9 +39,11 @@ class MonopolManager{
             return instance;
         }
 
+        static float StartMoney;
+
         std::vector<std::shared_ptr<Player>>& getPlayers();
         std::shared_ptr<Player>& getCurrentPlayer();
-        void setCurrentPlayer(std::shared_ptr<Player> p);
+        void setCurrentPlayer(std::shared_ptr<Player>& p);
         std::vector<Chance>& getChanceCards();
         int RollDice();
         const std::shared_ptr<Player>* CheckStreetOwner(const std::shared_ptr<Square>& square);
@@ -56,5 +59,9 @@ class MonopolManager{
         void BuyWaterCompany(WaterCompany* waterCompany);
         void BuyElectricCompanyOwner(ElectricCompany* electricCompany);
         void CheckEdgeSquare(EdgeSquare* edgeSquare);
+        void GoToJail();
+        void GrantPlayerMoney(float sum);
+        bool areAllRestPlayersHaveBankRupt(std::shared_ptr<Player>& p);
+        std::shared_ptr<Player>* CheckIsWinner();
 
 };

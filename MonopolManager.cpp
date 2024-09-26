@@ -1,8 +1,6 @@
 #include "MonopolManager.hpp"
 
 
-
-
 MonopolManager::MonopolManager() 
 {
     chanceStrings.push_back("Advance to Go (Collect $200)");
@@ -29,9 +27,10 @@ MonopolManager::MonopolManager()
         chanceCards.push_back(c);
     }
                     
-
+ 
 }
 
+float MonopolManager::StartMoney = 200;
 
 std::vector<std::shared_ptr<Player>>&  MonopolManager::getPlayers()
 {
@@ -45,7 +44,7 @@ std::shared_ptr<Player>& MonopolManager::getCurrentPlayer()
     return currentPlayer;
  }
  
-void MonopolManager::setCurrentPlayer(std::shared_ptr<Player> p)
+void MonopolManager::setCurrentPlayer(std::shared_ptr<Player>& p)
 {
     currentPlayer = p;
 }
@@ -85,7 +84,6 @@ const std::shared_ptr<Player>* MonopolManager::CheckStreetOwner(const std::share
            }
        }     
     }
-
     return nullptr;
 }
 
@@ -110,7 +108,6 @@ const std::shared_ptr<Player>* MonopolManager::CheckTrainOwner(const std::shared
         }
     }
     return nullptr;
-    
 }
 
 const std::shared_ptr<Player>* MonopolManager::CheckWaterCompanyOwner(const std::shared_ptr<Square>& square)
@@ -143,10 +140,10 @@ const std::shared_ptr<Player>* MonopolManager::CheckElectricCompanyOwner(const s
 
 void MonopolManager::CheckTaxPrice(Tax* tax)
 {
-    std::cout << "You need to pay  " << tax->getPrice() << "to the bank" << std::endl;
+    std::cout << "You need to pay  " << tax->getPrice() << " to the bank" << std::endl;
     std::cout << "current money:  " << currentPlayer->getMoney()<< std::endl;
     currentPlayer->setMoney(currentPlayer->getMoney() - tax->getPrice());
-    std::cout << "Charging your money...  " <<"/n" <<" money remained after charge: "<< currentPlayer->getMoney()<< std::endl;
+    std::cout << "Charging your money...  " << std::endl <<" money remained after charge: "<< currentPlayer->getMoney()<< std::endl;
 }
 
  void MonopolManager::AddChance()
@@ -171,11 +168,11 @@ void MonopolManager::CheckTaxPrice(Tax* tax)
  void MonopolManager::BuyStreet(Street* street)
  {
     int ans;
-    street->display(std::cout);
-    currentPlayer->displayShort(std::cout);
+    std::cout<<"Current money: " <<currentPlayer->getMoney()<< std::endl;
+    
     if(currentPlayer->getMoney() < street->getPrice())
     {
-        std::cout << "You don't have enough money..." <<std::endl;
+        std::cout << "You don't have enough money to buy this street..." <<std::endl;
     }
 
     else
@@ -186,24 +183,23 @@ void MonopolManager::CheckTaxPrice(Tax* tax)
         {
             if(currentPlayer->PurchaseStreet(street))
             {
-                std::cout<<"Street: "<< street->name << "was purchased succesfully" <<std::endl;
+                std::cout<<"Street: "<< street->name << " was purchased succesfully" <<std::endl;
                 currentPlayer->displayLong(std::cout);
             }
         }
        
     }
    
-
  }
 
   void MonopolManager::BuyTrain(Train* train)
  {
     int ans;
-    train->display(std::cout);
-    currentPlayer->displayShort(std::cout);
+    std::cout<<"Current money: " <<currentPlayer->getMoney()<< std::endl;
+    std::cout<<"Cost: " <<train->getPrice()<< std::endl;
     if(currentPlayer->getMoney() < train->getPrice())
     {
-        std::cout << "You don't have enough money..." <<std::endl;
+        std::cout << "You don't have enough money to buy this train..." <<std::endl;
     }
 
     else
@@ -214,7 +210,7 @@ void MonopolManager::CheckTaxPrice(Tax* tax)
         {
             if(currentPlayer->PurchaseTrain(train))
             {
-                std::cout<<"Train: "<< train->name << "was purchased succesfully" <<std::endl;
+                std::cout<<"Train: "<< train->name << " was purchased succesfully" <<std::endl;
                 currentPlayer->displayLong(std::cout);
             }
         }
@@ -226,20 +222,130 @@ void MonopolManager::CheckTaxPrice(Tax* tax)
 
   void MonopolManager::BuyWaterCompany(WaterCompany* waterCompany)
  {
+    int ans;
+    std::cout<<"Current money: " <<currentPlayer->getMoney()<< std::endl;
+    std::cout<<"Cost: " <<waterCompany->getPrice()<< std::endl;
+    if(currentPlayer->getMoney() < waterCompany->getPrice())
+    {
+        std::cout << "You don't have enough money to buy the Water Company..." <<std::endl;
+    }
 
-    
+    else
+    {
+        std::cout << "Do you want to buy the Water Company? 1.Yes , 2.No" <<std::endl;
+        std::cin >> ans; 
+        if(ans ==1)
+        {
+            if(currentPlayer->PurchaseWaterCompany(waterCompany))
+            {
+                std::cout<< waterCompany->name << " was purchased succesfully" <<std::endl;
+                currentPlayer->displayLong(std::cout);
+            }
+        }
+       
+    }
+
  }
 
 
   void MonopolManager::BuyElectricCompanyOwner(ElectricCompany* electricCompany)
  {
+    int ans;
+    std::cout<<"Current money: " <<currentPlayer->getMoney()<< std::endl;
+    std::cout<<"Cost: " <<electricCompany->getPrice()<< std::endl;
+    if(currentPlayer->getMoney() < electricCompany->getPrice())
+    {
+        std::cout << "You don't have enough money to buy the Water Company..." <<std::endl;
+    }
 
+    else
+    {
+        std::cout << "Do you want to buy the Water Company? 1.Yes , 2.No" <<std::endl;
+        std::cin >> ans; 
+        if(ans ==1)
+        {
+            if(currentPlayer->PurchaseElectricCompany(electricCompany))
+            {
+                std::cout<< electricCompany->name << " was purchased succesfully" <<std::endl;
+                currentPlayer->displayLong(std::cout);
+            }
+        }
+       
+    }
     
  }
 
  
   void MonopolManager::CheckEdgeSquare(EdgeSquare* edgeSquare)
  {
+    switch(edgeSquare->getType())
+    {
+        case EdgeSquareType::Start:
+            GrantPlayerMoney(StartMoney);
+            break;
+        case EdgeSquareType::FreeParking:
+            std::cout << "You are on FREE PARKING square, turn finished ..." <<std::endl;
+            break;
+        case EdgeSquareType::GoToJail:
+           std::cout << "You are going to jail !!" <<std::endl;
+           std::cout << "Know your rights ." <<std::endl;
+                GoToJail();
 
+         case EdgeSquareType::VisitNearJail:
+           std::cout << "You are visiting near the jail, nothing to do here ..." <<std::endl;
+                break;       
+
+    }
     
+ }
+
+ void MonopolManager::GrantPlayerMoney(float sum)
+ {
+    currentPlayer->addMoney(sum);
+ }
+
+ void MonopolManager::GoToJail()
+ {
+    currentPlayer->setIsInJail(true);
+    Point2D jailSquare(0,10);
+    currentPlayer->GoToSquare(jailSquare);
+
+ }
+
+
+ std::shared_ptr<Player>* MonopolManager::CheckIsWinner()
+ {
+    if(currentPlayer->getMoney() >= 4000)
+    {
+        return &currentPlayer;
+    }
+    for (int i = 0; i < players.size(); i++)
+    {
+        if((areAllRestPlayersHaveBankRupt(players[i]) && 
+        !players[i]->getIsBankrupt()) )
+        {
+            return &players[i];  
+        }
+    }
+    return nullptr;
+ }
+
+
+ bool MonopolManager::areAllRestPlayersHaveBankRupt(std::shared_ptr<Player>& p)
+ {
+    for (int i = 0; i < players.size(); i++)
+    {
+       if(players[i] == p)
+       {
+         continue;
+       }
+       else
+       {
+          if(!players[i]->getIsBankrupt())  
+          {
+            return false;
+          }
+       }
+    }
+    return true;
  }

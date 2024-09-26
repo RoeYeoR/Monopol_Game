@@ -24,25 +24,38 @@ int main ()
          MonopolManager::getInstance().getPlayers().push_back(std::make_shared<Player>(name));
     }
     
+    std::cout<<std::endl;
+    std::cout<<std::endl;
+
     MonopolManager::getInstance().setCurrentPlayer(MonopolManager::getInstance().getPlayers()[0]);
    
-    std::cout << "Number of players:" <<numOfPlayers <<std::endl;
-    std::cout << "Displaying the players:" <<std::endl;
+    std::cout << "Number of players:" <<numOfPlayers <<std::endl << std::endl;
+    std::cout << "Displaying the players:" <<std::endl << std::endl;
     for (int i = 0; i <  MonopolManager::getInstance().getPlayers().size() ; i++)
     {
        MonopolManager::getInstance().getPlayers()[i]->displayShort(std::cout);
        std::cout << std::endl;
     }
-    
-    //player 1 turn
+
+
+    std::shared_ptr<Player>* winner = nullptr;
+    int i=0;
+   
+    while (winner == nullptr )
+    {
+    std::cout << "************************************"<< std::endl<< std::endl; 
+   
+    MonopolManager::getInstance().setCurrentPlayer(MonopolManager::getInstance().getPlayers()[i]);
+    //player i turn
     currentPlayer = MonopolManager::getInstance().getCurrentPlayer();
+    std::cout << currentPlayer->getName() <<"'s turn!"<< std::endl<< std::endl;
     int diceResult = MonopolManager::getInstance().RollDice();
     std::cout << "Dice Result: " << diceResult << std::endl;
     
     currentPlayer->MoveOnBoard(diceResult);
     Point2D& newPos = currentPlayer->getCurrentPosition();
-    std::cout << "Player's new position: " << newPos << std::endl;
-    std::cout << "New position status: " <<  std::endl;
+    std::cout << currentPlayer->getName()<<"-> new position: " << newPos << std::endl<< std::endl;
+    
     (actuallBoard[newPos.getX()][newPos.getY()]->display(std::cout));
     
     const std::shared_ptr<Player>* p = board.checkSquareOwnerShip(actuallBoard[newPos.getX()][newPos.getY()]);
@@ -53,8 +66,15 @@ int main ()
     else
     {
        actuallBoard[newPos.getX()][newPos.getY()]->display(std::cout);
-       std::cout <<"it's occupied  by " << (*currentPlayer).getName();
+       std::cout <<"This Sqaure is owned by " << (*p)->getName();
     }
+
+        winner = MonopolManager::getInstance().CheckIsWinner();
+        i++;
+        i = (i % numOfPlayers);
+        std::cout << "************************************"<< std::endl<< std::endl; 
+    }
+   
 
     //return 0;
 }

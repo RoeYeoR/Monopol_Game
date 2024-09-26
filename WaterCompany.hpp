@@ -12,6 +12,7 @@ class WaterCompany :public Square {
     public:
         WaterCompany();
         WaterCompany(std::string name);
+        float getPrice();
         void display(std::ostream& os) const override;
 
 };

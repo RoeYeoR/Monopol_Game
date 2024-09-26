@@ -1,16 +1,16 @@
 #include "EdgeSquare.hpp"
 
 
-EdgeSquare::EdgeSquare( std::string name) : Square(name) {}
+EdgeSquare::EdgeSquare(EdgeSquareType esType) : type(esType) {}
 
 
- std::string EdgeSquare::getDescription()
+ EdgeSquareType EdgeSquare::getType()
  {
-    return name;
+    return type;
  }
 
  void EdgeSquare::display(std::ostream& os) const 
  {
-    os << "EdgeSquare: " << name << std::endl;
+    os << "EdgeSquare: " << type << std::endl;
 
  }

@@ -8,9 +8,11 @@ Player::Player(std::string name) : name(name) , money(1500)
 
     hasOwnElectricCompany = false;
     hasOwnWaterCompany = false;
+    isInJail = false;
+    isBankrupt =false;
 }
 
- std::string Player::getName()
+std::string Player::getName() 
  {
     return name;
  }
@@ -22,10 +24,33 @@ float Player::getMoney()
 
 }
 
- float Player::setMoney(float newMoney)
+bool  Player::getIsInJail()
+{
+   return isInJail;
+}
+
+bool Player::getIsBankrupt()
+{
+
+    return isBankrupt;
+}
+
+ void Player::setMoney(float newMoney)
  {
 
     money = newMoney;
+ }
+
+ void Player::addMoney(float newMoney)
+ {
+
+    money += newMoney;
+ }
+
+
+ void Player::setIsInJail(bool var)
+ {
+    isInJail = var;
  }
 
 Point2D& Player::getCurrentPosition()
@@ -134,10 +159,15 @@ void Player::MoveOnBoard(int diceResult)
         }
 
         currentPosition.setY(currentPosition.getY() - diceResult);
-    }
-
-    
+    } 
  }
+
+}
+
+
+void Player::GoToSquare(Point2D& p)
+{
+    currentPosition = p;
 
 }
 
@@ -154,6 +184,22 @@ void Player::MoveOnBoard(int diceResult)
     money -= train->getPrice();
     return true;
  }
+
+bool Player::PurchaseWaterCompany(WaterCompany* waterCompany)
+{
+    money -= waterCompany->getPrice();
+    hasOwnWaterCompany = true;
+    return true;
+}
+
+
+bool Player::PurchaseElectricCompany(ElectricCompany* electricCompany )
+{
+
+    money -= electricCompany->getPrice();
+    hasOwnElectricCompany = true;
+    return true;
+}
 
 bool Player::AddChance()
 {
@@ -176,8 +222,6 @@ bool Player::AddChance()
    
 }
 
-
-
  void Player::displayShort(std::ostream& os) const 
  {
     os << "Player short status: " << "name: " << name << "," << " money: " << money << std::endl;
@@ -187,26 +231,39 @@ bool Player::AddChance()
   void Player::displayLong(std::ostream& os) const 
  {
     os << "Player status: " << "name: " << name << "," << " money: " << money << 
-    "current Position on board: " << currentPosition << "Own Electric Company?" << (hasOwnElectricCompany ? "Yes" : "No")
-    <<  "Own Water Company?" << (hasOwnWaterCompany ? "Yes" : "No") <<std::endl;
+    ", current Position on board: " << currentPosition << ", Own Electric Company?" << (hasOwnElectricCompany ? "Yes" : "No")
+    <<  ", Own Water Company?" << (hasOwnWaterCompany ? "Yes" : "No") <<std::endl;
 
     // Loop through all streets and call their display method
     os << "Owned Streets:" << std::endl;
-    for (const Street& street : getStreets()) {
+    if(streets.size() ==0)
+    {
+         os << "No streets yet." << std::endl;
+    }
+    else{
+        
+        for (const Street& street : streets) {
         street.display(os); // Call the display method for each street
+        }
+
     }
 
-     // Loop through all trains and call their display method
+   // Loop through all trains and call their display method
     os << "Owned Trains:" << std::endl;
+    if(trains.size() ==0)
+    {
+         os << "No trains yet." << std::endl;
+    }
+    else{
+    
     for (const Train& train : getTrains()) {
         train.display(os); // Call the display method for each train
     }
 
 
-    
-
-    
-    
+    }
   
+
+
 
  }
