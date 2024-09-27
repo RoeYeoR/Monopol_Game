@@ -3,9 +3,8 @@
 
 Board::Board() :board(rows, std::vector<std::shared_ptr<Square>>(cols))
 {   
-
     //edge square
-    setSquare(0,0,std::make_shared<EdgeSquare>(EdgeSquareType::FreeParking));
+    setSquare(0,0,std::make_shared<EdgeSquare>("FREE PARKING",EdgeSquareType::FreeParking));
 
     setSquare(0, 1, std::make_shared<Street>("KENTUCKY Ave", 220,Color::Red,100));
     setSquare(0, 2, std::make_shared<Chance>("Chance Square"));
@@ -18,7 +17,7 @@ Board::Board() :board(rows, std::vector<std::shared_ptr<Square>>(cols))
     setSquare(0, 9, std::make_shared<Street>("MARVIN GARDEN", 120,Color::Yellow,100));
 
     //edge square
-    setSquare(0,10,std::make_shared<EdgeSquare>(EdgeSquareType::GoToJail));
+    setSquare(0,10,std::make_shared<EdgeSquare>("GO TO JAIL !",EdgeSquareType::GoToJail));
 
     setSquare(1, 10, std::make_shared<Street>("PACIFIC Ave", 300,Color::Green,100));
     setSquare(2,10, std::make_shared<Street>("NORTH CAROLINA Ave", 300,Color::Green,100));
@@ -31,7 +30,7 @@ Board::Board() :board(rows, std::vector<std::shared_ptr<Square>>(cols))
     setSquare(9, 10, std::make_shared<Street>("BOARDWALK", 400,Color::Blue,100));
 
      //edge square
-    setSquare(10,10,std::make_shared<EdgeSquare>(EdgeSquareType::Start));
+    setSquare(10,10,std::make_shared<EdgeSquare>("START",EdgeSquareType::Start));
 
     setSquare(10, 9, std::make_shared<Street>("MEDITER-RANEAN Ave", 60,Color::Brown,100));
     setSquare(10, 8, std::make_shared<CommunityChest>("CommunityChest Square"));
@@ -44,7 +43,7 @@ Board::Board() :board(rows, std::vector<std::shared_ptr<Square>>(cols))
     setSquare(10, 1, std::make_shared<Street>("CONNECTICUT Ave", 120,Color::Azure,100));
 
     //edge square
-    setSquare(10,0,std::make_shared<EdgeSquare>(EdgeSquareType::VisitNearJail));
+    setSquare(10,0,std::make_shared<EdgeSquare>("VISITING NEAR JAIL",EdgeSquareType::VisitNearJail));
 
     setSquare(1, 0, std::make_shared<Street>("NEW YORK Ave", 200,Color::Orange,100));
     setSquare(2, 0, std::make_shared<Street>("TENNESSEE Ave", 180,Color::Orange,100));

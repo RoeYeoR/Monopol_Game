@@ -1,7 +1,7 @@
 #include "EdgeSquare.hpp"
 
 
-EdgeSquare::EdgeSquare(EdgeSquareType esType) : type(esType) {}
+EdgeSquare::EdgeSquare(std::string name,EdgeSquareType esType) :Square(name), type(esType) {}
 
 
  EdgeSquareType EdgeSquare::getType()

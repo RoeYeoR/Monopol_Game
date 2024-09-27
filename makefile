@@ -1,63 +1,31 @@
-# all: compile link
+# Define the source files
+SOURCES = main.cpp Board.cpp Chance.cpp CommunityChest.cpp EdgeSquare.cpp ElectricCompany.cpp  MonopolManager.cpp Player.cpp Point2D.cpp Street.cpp Tax.cpp Train.cpp WaterCompany.cpp
 
-# compile:
-# 	g++ -c main.cpp -I"C:\Users\Roi\Documents\Libraries\SFML-2.6.1\include" -DSFML_STATIC
+# Define the object files
+OBJECTS = $(SOURCES:.cpp=.o)
 
-# link:
-# 	g++ main.o -o main -L"C:\Users\Roi\Documents\Libraries\SFML-2.6.1\lib" -lsfml-graphics-s -lsfml-window-s -lsfml-system-s -lopengl32 -lfreetype -lwinmm -lgdi32 -mwindows
+# Define the SFML include and library paths
+INCLUDE_PATH = "C:\Users\Roi\Documents\Libraries\SFML-2.6.1\include"
+LIBRARY_PATH = "C:\Users\Roi\Documents\Libraries\SFML-2.6.1\lib"
 
-all: monopol
-# Compiler
+# Compiler and linker flags
 CXX = g++
-CXXFLAGS = -std=c++14 -Wall -g  # Use C++14, enable all warnings, and debug info
+CXXFLAGS = -I$(INCLUDE_PATH) -DSFML_STATIC
+LDFLAGS = -L$(LIBRARY_PATH) -lsfml-graphics-s -lsfml-window-s -lsfml-system-s -lopengl32 -lfreetype -lwinmm -lgdi32 -mwindows
 
-# Target executable name
-TARGET = monopol
+# Target for building everything
+all: compile link
 
-# Source files
-SRC = \
-    Board.cpp \
-    Chance.cpp \
-    CommunityChest.cpp \
-    EdgeSquare.cpp \
-    ElectricCompany.cpp \
-    Monopol.cpp \
-    MonopolManager.cpp \
-    Player.cpp \
-    Point2D.cpp \
-    Street.cpp \
-    Tax.cpp \
-    Train.cpp \
-    WaterCompany.cpp
+# Compile phase
+compile: $(OBJECTS)
 
-# Object files (replace .cpp with .o)
-OBJ = $(SRC:.cpp=.o)
-
-# Header files
-HEADERS = \
-    Board.hpp \
-    Chance.hpp \
-    ColorEnum.hpp \
-    CommunityChest.hpp \
-    EdgeSquare.hpp \
-    ElectricCompany.hpp \
-    MonopolManager.hpp \
-    Player.hpp \
-    Point2D.hpp \
-    Square.hpp \
-    Street.hpp \
-    Tax.hpp \
-    Train.hpp \
-    WaterCompany.hpp
-
-# Default rule to build the target
-monopol: $(OBJ)
-	$(CXX) $(CXXFLAGS) -o monopol $(OBJ)
-
-# Rule to compile .cpp files to .o files
-%.o: %.cpp $(HEADERS)
+%.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# Clean rule to remove generated files
+# Link phase
+link:
+	$(CXX) $(OBJECTS) -o main $(LDFLAGS)
+
+# Clean up object files
 clean:
-	rm -f $(OBJ) monopol
+	rm -f *.o main

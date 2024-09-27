@@ -120,6 +120,11 @@
       "cwd": "c:\\Users\\Roi\\Desktop\\ComputerScience\\YearB\\SemesterB\\Systems2\\Systems2_FinalProject",
       "binaryPath": "c:\\Users\\Roi\\Desktop\\ComputerScience\\YearB\\SemesterB\\Systems2\\Systems2_FinalProject\\monopol",
       "binaryArgs": []
+    },
+    {
+      "cwd": "c:\\Users\\Roi\\Desktop\\ComputerScience\\YearB\\SemesterB\\Systems2\\Systems2_FinalProject",
+      "binaryPath": "c:\\Users\\Roi\\Desktop\\ComputerScience\\YearB\\SemesterB\\Systems2\\Systems2_FinalProject\\main",
+      "binaryArgs": []
     }
   ]
 }

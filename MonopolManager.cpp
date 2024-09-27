@@ -172,7 +172,7 @@ void MonopolManager::CheckTaxPrice(Tax* tax)
 
  float MonopolManager::getActuallBillOfSquare(std::shared_ptr<Square>& square,std::shared_ptr<Player>* ownPlayer)
  {
-    float price;
+    float price=0;
     if(auto street = dynamic_cast<Street*>(square.get()))
     {
         if(street->getNumOfHouses()>0 && street->getHasHotel() == false)
@@ -189,10 +189,11 @@ void MonopolManager::CheckTaxPrice(Tax* tax)
         }
       
     }
-
     else if(auto train = dynamic_cast<Train*>(square.get()))
     {
-        switch((*ownPlayer)->getTrains().size()>0)
+        if((*ownPlayer)->getTrains().size()>0)
+        {
+             switch((*ownPlayer)->getTrains().size())
         {
            case 1:
             price = 50;
@@ -210,6 +211,8 @@ void MonopolManager::CheckTaxPrice(Tax* tax)
             price =200; 
              break;
         }
+
+        }  
     }
 
     return price;
@@ -339,7 +342,7 @@ void MonopolManager::CheckTaxPrice(Tax* tax)
            std::cout << "You are going to jail !!" <<std::endl;
            std::cout << "Know your rights ." <<std::endl;
                 GoToJail();
-
+                 break;   
          case EdgeSquareType::VisitNearJail:
            std::cout << "You are visiting near the jail, nothing to do here ..." <<std::endl;
                 break;       
@@ -505,3 +508,13 @@ void MonopolManager::UpgradeStreet(Street* street)
     }
     return true;
  }
+
+ void MonopolManager::SetIcon(std::shared_ptr<Square>& square , std::string iconName) {
+        // Example of setting an icon texture for the square
+        sf::Texture iconTexture;
+        if (!iconTexture.loadFromFile("C:\\Users\\Roi\\Desktop\\ComputerScience\\YearB\\SemesterB\\Systems2\\Systems2_FinalProject\\Icons\\"+iconName)) {
+            std::cerr << "Error loading icon texture\n";
+            return; // Handle error
+        }
+        square->setIcon(iconTexture);
+    }

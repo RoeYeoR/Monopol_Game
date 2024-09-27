@@ -22,7 +22,7 @@ class EdgeSquare : public Square {
         EdgeSquareType type;
 
     public:
-        EdgeSquare(EdgeSquareType esType);
+        EdgeSquare(std::string name,EdgeSquareType esType);
         EdgeSquareType getType();
         virtual void display(std::ostream& os) const override;
 

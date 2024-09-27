@@ -13,6 +13,10 @@
 #include <cstdlib>  // For rand() and srand()
 #include "Player.hpp"
 
+#include <memory>
+#include <SFML/Graphics.hpp>
+
+
 class Player;  // Forward declaration
 
 
@@ -68,5 +72,6 @@ class MonopolManager{
         void GrantPlayerMoney(float sum);
         bool areAllRestPlayersHaveBankRupt(std::shared_ptr<Player>& p);
         std::shared_ptr<Player>* CheckIsWinner();
+        void SetIcon(std::shared_ptr<Square>& square,std::string iconName);
 
 };

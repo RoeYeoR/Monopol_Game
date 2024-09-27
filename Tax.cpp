@@ -1,6 +1,6 @@
 #include "Tax.hpp"
 
-Tax::Tax(std::string desc, float price) : Square(name,price) {}
+Tax::Tax(std::string name, float price) : Square(name,price) {}
 
 
 void Tax::display(std::ostream& os) const

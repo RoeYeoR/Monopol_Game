@@ -94,6 +94,11 @@ const bool Player::gethasOwnElectricCompany() const
         return hasOwnElectricCompany;
 }
 
+ std::vector<Chance>& Player::getChanceCards()
+ {
+    return ChanceCards;
+ }
+
 
 void Player::MoveOnBoard(int diceResult)
 {
