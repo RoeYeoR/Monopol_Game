@@ -1,4 +1,16 @@
 #include "MonopolManager.hpp"
+#include <SFML/Graphics.hpp>
+
+
+
+
+ std::string GLOBAL_START_ICON = "Start";
+ std::string GLOBAL_GOTOJAIL_ICON = "GoToJail";
+ std::string GLOBAL_VISITING_ICON = "Jail";
+ std::string GLOBAL_FREE_PRAKING_ICON = "FreeParking";
+
+
+
 
 
 MonopolManager::MonopolManager() 
@@ -351,6 +363,36 @@ void MonopolManager::CheckTaxPrice(Tax* tax)
     
  }
 
+void MonopolManager::CheckEdgeSquareType(std::shared_ptr<Square>& square)
+{
+   if(auto edgeSquare = dynamic_cast<EdgeSquare*>(square.get()))
+   {
+     switch(edgeSquare->getType())
+    {
+        case EdgeSquareType::Start:
+             SetIcon(square,GLOBAL_START_ICON);   
+            break;
+        case EdgeSquareType::FreeParking:
+            SetIcon(square,GLOBAL_FREE_PRAKING_ICON);   
+            break;
+        case EdgeSquareType::GoToJail:
+           SetIcon(square,GLOBAL_GOTOJAIL_ICON);   
+                 break;   
+         case EdgeSquareType::VisitNearJail:
+           SetIcon(square,GLOBAL_VISITING_ICON);   
+                break;            
+    }
+
+
+
+
+
+
+
+   }
+   
+}
+
 
 void MonopolManager::UpgradeStreet(Street* street)
 {
@@ -509,12 +551,17 @@ void MonopolManager::UpgradeStreet(Street* street)
     return true;
  }
 
- void MonopolManager::SetIcon(std::shared_ptr<Square>& square , std::string iconName) {
-        // Example of setting an icon texture for the square
-        sf::Texture iconTexture;
-        if (!iconTexture.loadFromFile("C:\\Users\\Roi\\Desktop\\ComputerScience\\YearB\\SemesterB\\Systems2\\Systems2_FinalProject\\Icons\\"+iconName)) {
-            std::cerr << "Error loading icon texture\n";
-            return; // Handle error
+  void MonopolManager::SetIcon(std::shared_ptr<Square>& square, const std::string& iconName) {
+        // Check if texture is already loaded
+        if (textures.find(iconName) == textures.end()) {
+            sf::Texture iconTexture;
+            if (!iconTexture.loadFromFile("C:\\Users\\Roi\\Desktop\\ComputerScience\\YearB\\SemesterB\\Systems2\\Systems2_FinalProject\\Icons\\" + iconName + ".png")) {
+                std::cerr << "Error loading icon texture: " << iconName << "\n";
+                return; // Handle error
+            }
+            textures[iconName] = iconTexture; // Store the texture
         }
-        square->setIcon(iconTexture);
+
+        // Set the texture for the square
+        square->setIcon(textures[iconName]);
     }

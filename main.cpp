@@ -1,11 +1,8 @@
 #include <SFML/Graphics.hpp>
-
-
+#include <SFML/Audio.hpp>
 #include "MonopolManager.hpp"
 #include "Board.hpp" 
-
-
-
+#include "EdgeSquare.hpp" 
 
 
 int main()
@@ -26,6 +23,23 @@ int main()
     return -1; // Handle error
     }
 
+    //  // Create a music object
+    // sf::Music music;
+
+    // // Load music from a file (WAV, OGG, or FLAC)
+    // if (!music.openFromFile("C:\\Users\\Roi\\Desktop\\ComputerScience\\YearB\\SemesterB\\Systems2\\Systems2_FinalProject\\Audio\\GameMusic.ogg"))
+    // {
+    //     std::cerr << "Error loading music file\n";
+    //     return -1;
+    // }
+
+    // // Play the music
+    // music.play();
+
+    // // Set music properties (optional)
+    // music.setLoop(true); // Set the music to loop
+
+
     //Get Font
     sf::Font font;
     if (!font.loadFromFile("C:\\Users\\Roi\\Desktop\\ComputerScience\\YearB\\SemesterB\\Systems2\\Systems2_FinalProject\\Fonts\\GameFont2.ttf")) 
@@ -33,16 +47,25 @@ int main()
         std::cerr << "Error loading font\n"; // Print error message
         return -1; // Handle error
     }
-    //Get Textures
-    sf::Texture iconTexture;
-    if (!iconTexture.loadFromFile("C:\\Users\\Roi\\Desktop\\ComputerScience\\YearB\\SemesterB\\Systems2\\Systems2_FinalProject\\Icons\\Start.png")) { // Update with your icon path
-        std::cerr << "Error loading icon texture\n";
-        return -1; // Handle error
-    }
+    // //Get Textures
+    // sf::Texture iconTexture;
+    // if (!iconTexture.loadFromFile("C:\\Users\\Roi\\Desktop\\ComputerScience\\YearB\\SemesterB\\Systems2\\Systems2_FinalProject\\Icons\\Start.png")) { // Update with your icon path
+    //     std::cerr << "Error loading icon texture\n";
+    //     return -1; // Handle error
+    // }
 
 
+       // Instruction text
+    sf::Text instructionText;
+    instructionText.setFont(font);
+    instructionText.setCharacterSize(24);
+    instructionText.setFillColor(sf::Color::Yellow);
+    instructionText.setString("Welcome to Monopoly! Press SPACE to roll the dice.");
+    
    
-  
+    sf::FloatRect textBounds = instructionText.getLocalBounds();
+    instructionText.setOrigin(textBounds.width / 2, textBounds.height / 2); // Center the origin
+    instructionText.setPosition(windowSize.x / 2, windowSize.y / 2); // Position it in the center of the window
 
    
     std::vector<std::vector<sf::RectangleShape>> grid(boardSize, std::vector<sf::RectangleShape>(boardSize));
@@ -55,7 +78,7 @@ int main()
            
             sf::RectangleShape square(sf::Vector2f(cellWidth, cellHeight));
             square.setPosition(col * cellWidth, row * cellHeight);
-            square.setFillColor(sf::Color::White); // Default color
+            square.setFillColor(sf::Color(200, 220, 235)); // Default color
 
          if (row == 0 || row == boardSize - 1 || col == 0 || col == boardSize - 1)
          {
@@ -64,25 +87,41 @@ int main()
            
             if (dynamic_cast<EdgeSquare*>(squarePtr.get())) {
                 square.setFillColor(sf::Color::Green); // Edge squares
-
-                //Get Sprites
-                sf::Sprite iconSprite;
-                iconSprite.setTexture(iconTexture);
-
-                float iconSize = cellWidth * 0.5f; // Adjust the size of the icon as needed
-                iconSprite.setScale(iconSize /iconTexture.getSize().x , iconSize/iconTexture.getSize().y ); // Scale the icon
-                
-                // Center the icon within the square
-                iconSprite.setPosition(
-                col * cellWidth + (cellWidth - iconSprite.getGlobalBounds().width) / 2,
-                row * cellHeight + (cellHeight - iconSprite.getGlobalBounds().height) / 2);
-
-                 // Store the icon in the icon grid
-                    iconGrid[row][col] = iconSprite;
-
+                MonopolManager::getInstance().CheckEdgeSquareType(squarePtr);
+            
+                 
             }
-            else if (dynamic_cast<Street*>(squarePtr.get())) {
-                square.setFillColor(sf::Color::Yellow); // Streets
+            else if (auto street = dynamic_cast<Street*>(squarePtr.get())) {
+                sf::Color streetColor = sf::Color::White;
+                switch(street->getColor())
+                {
+                    case Color::Azure:
+                        streetColor = sf::Color(0, 127, 255);
+                        break;
+                    case Color::Blue:
+                        streetColor = sf::Color(40, 67, 135);  
+                         break;
+                    case Color::Brown:
+                        streetColor = sf::Color(130, 94, 92);  
+                         break;  
+                    case Color::Green:
+                        streetColor = sf::Color(195, 255, 104); 
+                         break;
+                    case Color::Orange:
+                        streetColor = sf::Color(251, 192, 147);  
+                         break;
+                    case Color::Pink:
+                        streetColor = sf::Color(227, 61, 148);
+                         break;  
+                    case Color::Red:
+                        streetColor = sf::Color(210, 77, 87);
+                         break;  
+                    case Color::Yellow:
+                        streetColor = sf::Color(254, 241, 96);
+                         break;  
+
+                }
+                square.setFillColor(streetColor); // Streets
             }
             else if (dynamic_cast<Train*>(squarePtr.get())) {
                 square.setFillColor(sf::Color::Red); // Train stations
@@ -94,16 +133,39 @@ int main()
             }
             else if (dynamic_cast<CommunityChest*>(squarePtr.get())) {
                 square.setFillColor(sf::Color::Blue); // Community Chest
+                MonopolManager::getInstance().SetIcon(squarePtr,"TreasureChestCard");
             }
             else if (dynamic_cast<Tax*>(squarePtr.get())) {
                 square.setFillColor(sf::Color::Magenta); // Taxes
                 MonopolManager::getInstance().SetIcon(squarePtr,"Tax");
             }
+              else if (dynamic_cast<ElectricCompany*>(squarePtr.get())) {
+                square.setFillColor(sf::Color::Magenta); // Taxes
+                MonopolManager::getInstance().SetIcon(squarePtr,"Electric");
+            }
+             else if (dynamic_cast<WaterCompany*>(squarePtr.get())) {
+                square.setFillColor(sf::Color::Magenta); // Taxes
+                MonopolManager::getInstance().SetIcon(squarePtr,"Water");
+            }
+
 
             // Store the square
             grid[row][col] = square;
-            iconGrid[row][col] = squarePtr->getIcon();
 
+          sf::Sprite iconSprite = squarePtr->getIcon();
+          if (iconSprite.getTexture()) {
+            float iconSize = cellWidth * 0.5f; // Adjust the size of the icon as needed
+            iconSprite.setScale(iconSize / iconSprite.getTexture()->getSize().x,
+                                iconSize / iconSprite.getTexture()->getSize().y);
+
+            // Center the icon within the square
+            iconSprite.setPosition(
+                col * cellWidth + (cellWidth - iconSprite.getGlobalBounds().width) / 2,
+                row * cellHeight + (cellHeight - iconSprite.getGlobalBounds().height) / 2);
+
+            // Store the sprite in the icon grid
+            iconGrid[row][col] = iconSprite;
+          }
 
             // Create and set up the text
             sf::Text text;
@@ -133,7 +195,7 @@ int main()
     // square.setPosition(50.f,150.f);
     // square.setFillColor(sf::Color::White);
 
-    std::cout << "Starting window loop..." << std::endl;
+   
     while (window.isOpen())
     {
         sf::Event event;
@@ -144,14 +206,15 @@ int main()
                 window.close();
             }
                 
-            // if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space) 
-            // {
-            //     // Handle dice roll or other actions
-            //    int diceResult = MonopolManager::getInstance().RollDice();
-
-            // }    
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space) 
+            {
+                // Handle dice roll or other actions
+                int diceResult = MonopolManager::getInstance().RollDice();
+                // Update the instruction text based on the action
+                instructionText.setString("You rolled a " + std::to_string(diceResult) + "!");
+            }
         }
-        std::cout << "Window loop ended." << std::endl;
+       
         window.clear();
 
           // Draw all the grid squares
@@ -171,11 +234,11 @@ int main()
                 }
                
            }
-    }
+        }
 
 
-        // window.draw(shape);
-        // window.draw(square);
+        // Draw the instruction text
+        window.draw(instructionText);
 
         window.display();
     }

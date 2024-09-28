@@ -17,12 +17,12 @@
 
         std::string getName() {return name;}
         float getPrice() { return price;}
-        
-        virtual void display(std::ostream& os) const = 0;  // Pure virtual function for polymorphism
-        virtual ~Square() = default;       // Virtual destructor for proper cleanup
 
         void setIcon(const sf::Texture& texture) { iconSprite.setTexture(texture);}
         sf::Sprite getIcon() {return iconSprite;}
+        
+        virtual void display(std::ostream& os) const = 0;  // Pure virtual function for polymorphism
+        virtual ~Square() = default;       // Virtual destructor for proper cleanup
 
         bool operator==(const Square& other) const
         {

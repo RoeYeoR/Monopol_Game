@@ -22,10 +22,21 @@ class Player;  // Forward declaration
 
 using namespace std;
 
+
+// Declare global strings here using extern
+extern std::string GLOBAL_START_ICON;
+extern std::string GLOBAL_GOTOJAIL_ICON;
+extern std::string GLOBAL_VISITING_ICON;
+extern std::string GLOBAL_FREE_PRAKING_ICON;
+
+
+
+
 class MonopolManager{
 
     private:
         //Board board; 
+        std::map<std::string, sf::Texture> textures; // Store textures
         std::vector<std::shared_ptr<Player>> players;
         std::vector<Chance> gameChanceCards;
         std::vector<std::string> chanceStrings;
@@ -65,6 +76,7 @@ class MonopolManager{
         void BuyElectricCompanyOwner(ElectricCompany* electricCompany);
         void UpgradeStreet(Street* street);
         void CheckEdgeSquare(EdgeSquare* edgeSquare);
+        void CheckEdgeSquareType(std::shared_ptr<Square>& square);
         bool ChargePlayer(std::shared_ptr<Player>& src,std::shared_ptr<Player>& dst, float amount);
         void TransferAllProperties(std::shared_ptr<Player>& src,std::shared_ptr<Player>& dst);
         bool DeleteAllProperties();
@@ -72,6 +84,6 @@ class MonopolManager{
         void GrantPlayerMoney(float sum);
         bool areAllRestPlayersHaveBankRupt(std::shared_ptr<Player>& p);
         std::shared_ptr<Player>* CheckIsWinner();
-        void SetIcon(std::shared_ptr<Square>& square,std::string iconName);
+        void SetIcon(std::shared_ptr<Square>& square, const std::string& iconName);
 
 };

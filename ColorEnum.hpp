@@ -10,6 +10,4 @@ enum Color {
     Orange,
     Red
 
-
-
 };
