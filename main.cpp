@@ -1,5 +1,10 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
+
+#include <iostream>
+#include <string>
+#include <vector>
+
 #include "MonopolManager.hpp"
 #include "Board.hpp" 
 #include "EdgeSquare.hpp" 
@@ -56,17 +61,45 @@ int main()
 
 
        // Instruction text
-    sf::Text instructionText;
-    instructionText.setFont(font);
-    instructionText.setCharacterSize(24);
-    instructionText.setFillColor(sf::Color::Yellow);
-    instructionText.setString("Welcome to Monopoly! Press SPACE to roll the dice.");
+    sf::Text WelcomeText;
+    WelcomeText.setFont(font);
+    WelcomeText.setCharacterSize(24);
+    WelcomeText.setFillColor(sf::Color::Black);
+    WelcomeText.setString("Enter number of players (2-8):");
     
    
-    sf::FloatRect textBounds = instructionText.getLocalBounds();
-    instructionText.setOrigin(textBounds.width / 2, textBounds.height / 2); // Center the origin
-    instructionText.setPosition(windowSize.x / 2, windowSize.y / 2); // Position it in the center of the window
+    sf::FloatRect textBounds = WelcomeText.getLocalBounds();
+    WelcomeText.setOrigin(textBounds.width / 2, textBounds.height / 2); // Center the origin
+    WelcomeText.setPosition(windowSize.x / 2, windowSize.y / 2 - 100); // Position it in the center of the window
 
+
+    // Text for user input
+    sf::Text playerInputText;
+    playerInputText.setFont(font);
+    playerInputText.setCharacterSize(24);
+    playerInputText.setFillColor(sf::Color::Black);
+    playerInputText.setPosition(windowSize.x / 2 - 50, windowSize.y / 2);
+    std::string input = "";
+    
+    // Flag to check if the number of players is entered
+    bool isNumPlayersEntered = false;
+    int numPlayers = 0;
+    int maxNumOfPlayers = 8;
+    // Placeholder for player icons
+    std::vector<sf::Sprite> playerIcons;
+    std::vector<sf::Texture> playerTexture;
+
+    for (int i = 0; i < maxNumOfPlayers; i++)
+    {
+        sf::Texture texture;
+        if (!texture.loadFromFile("C:\\Users\\Roi\\Desktop\\ComputerScience\\YearB\\SemesterB\\Systems2\\Systems2_FinalProject\\Icons\\Player" + std::to_string(i+1) + ".png")) 
+        {
+                std::cerr << "Error loading player texture " << "\n";
+                return -1; // Handle error
+        }
+       playerTexture.push_back(texture);
+    }
+    
    
     std::vector<std::vector<sf::RectangleShape>> grid(boardSize, std::vector<sf::RectangleShape>(boardSize));
     std::vector<std::vector<sf::Text>> textGrid(boardSize, std::vector<sf::Text>(boardSize));
@@ -78,12 +111,12 @@ int main()
            
             sf::RectangleShape square(sf::Vector2f(cellWidth, cellHeight));
             square.setPosition(col * cellWidth, row * cellHeight);
-            square.setFillColor(sf::Color(200, 220, 235)); // Default color
+            square.setFillColor(sf::Color(241, 231, 254)); // Default color
 
          if (row == 0 || row == boardSize - 1 || col == 0 || col == boardSize - 1)
          {
             // Assign a different color based on the type of square
-            auto squarePtr = board[row][col];  // Get your shared_ptr<Square>
+            auto squarePtr = board[row][col];  
            
             if (dynamic_cast<EdgeSquare*>(squarePtr.get())) {
                 square.setFillColor(sf::Color::Green); // Edge squares
@@ -183,17 +216,37 @@ int main()
             // Store the text in the text grid
             textGrid[row][col] = text;
           }
+          else
+          {
+            // Store Default square
+            grid[row][col] = square;
+          }
         }
     }
 
+    // Create two buttons: Player Status and Roll the Dice
+sf::RectangleShape playerStatusButton(sf::Vector2f(200.f, 50.f));
+playerStatusButton.setFillColor(sf::Color(100, 100, 250)); // Blue color
+playerStatusButton.setPosition(windowSize.x / 2 - 100, windowSize.y / 2 + 50); // Position in the center
 
-    // sf::CircleShape shape(30.f);
-    // shape.setFillColor(sf::Color::Green);
-    // shape.setPosition(20.f,20.f);
+sf::Text playerStatusText;
+playerStatusText.setFont(font);
+playerStatusText.setString("Player Status");
+playerStatusText.setCharacterSize(24);
+playerStatusText.setFillColor(sf::Color::White);
+playerStatusText.setPosition(playerStatusButton.getPosition().x + 20, playerStatusButton.getPosition().y + 10); // Center the text
 
-    // sf::RectangleShape square(sf::Vector2f(20.f,20.f));
-    // square.setPosition(50.f,150.f);
-    // square.setFillColor(sf::Color::White);
+sf::RectangleShape rollDiceButton(sf::Vector2f(200.f, 50.f));
+rollDiceButton.setFillColor(sf::Color(100, 250, 100)); // Green color
+rollDiceButton.setPosition(windowSize.x / 2 - 100, windowSize.y / 2 + 120); // Below Player Status button
+
+sf::Text rollDiceText;
+rollDiceText.setFont(font);
+rollDiceText.setString("Roll the Dice");
+rollDiceText.setCharacterSize(24);
+rollDiceText.setFillColor(sf::Color::White);
+rollDiceText.setPosition(rollDiceButton.getPosition().x + 20, rollDiceButton.getPosition().y + 10);
+
 
    
     while (window.isOpen())
@@ -205,15 +258,66 @@ int main()
             {
                 window.close();
             }
+
+
+             // Handle text input for number of players
+            if (!isNumPlayersEntered && event.type == sf::Event::TextEntered) {
+                if (event.text.unicode >= '0' && event.text.unicode <= '9') {
+                    input += static_cast<char>(event.text.unicode);
+                    playerInputText.setString(input);
+                }
+                else if (event.text.unicode == '\b' && !input.empty()) { // Handle backspace
+                    input.pop_back();
+                    playerInputText.setString(input);
+                }
+                else if (event.text.unicode == 13 && !input.empty()) { // Enter key pressed
+                    numPlayers = std::stoi(input);
+                    if (numPlayers >= 2 && numPlayers <= 8) {
+                        isNumPlayersEntered = true;
+
+                        // Generate player icons
+                        for (int i = 0; i < numPlayers; ++i) {
+                            sf::Sprite playerIcon;
+                            playerIcon.setPosition(10 * cellWidth, 10 * cellHeight); // Starting square (10,10)
+                            playerIcon.setTexture(playerTexture[i]);
+                            playerIcons.push_back(playerIcon);
+                        }
+
+                        WelcomeText.setString("Players have been placed on the start square.");
+                    } else {
+                        input = ""; // Reset invalid input
+                        playerInputText.setString(input);
+                        WelcomeText.setString("Please enter a valid number (2-8):");
+                    }
+
+                }
+            }
                 
-            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space) 
+                // Detect clicks on the buttons
+            if (event.type == sf::Event::MouseButtonPressed)
             {
-                // Handle dice roll or other actions
-                int diceResult = MonopolManager::getInstance().RollDice();
-                // Update the instruction text based on the action
-                instructionText.setString("You rolled a " + std::to_string(diceResult) + "!");
+                if (event.mouseButton.button == sf::Mouse::Left) 
+                {
+                    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+
+                    // Check if Player Status button is clicked
+                    if (playerStatusButton.getGlobalBounds().contains(mousePos.x, mousePos.y)) 
+                    {
+                        // Show player status
+                        WelcomeText.setString("Player Status clicked!");
+                    }
+
+                    // Check if Roll the Dice button is clicked
+                    if (rollDiceButton.getGlobalBounds().contains(mousePos.x, mousePos.y)) 
+                    {
+                        // Roll the dice
+                        int diceResult = MonopolManager::getInstance().RollDice();
+                        WelcomeText.setString("You rolled a " + std::to_string(diceResult) + "!");
+                    }
+                }
             }
         }
+
        
         window.clear();
 
@@ -237,11 +341,30 @@ int main()
         }
 
 
-        // Draw the instruction text
-        window.draw(instructionText);
+        // Draw the Welcome text
+        window.draw(WelcomeText);
 
-        window.display();
+          if (!isNumPlayersEntered) {
+            window.draw(playerInputText);
+        }
+
+        // Draw player icons if the number of players is entered
+    if (isNumPlayersEntered)
+     {
+        for (auto& playerIcon : playerIcons)
+        {
+            window.draw(playerIcon);
+        }
+
+        window.draw(playerStatusButton);
+        window.draw(playerStatusText);
+        window.draw(rollDiceButton);
+        window.draw(rollDiceText);
+        
     }
+
+    window.display();
+}
 
     return 0;
 }
