@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <sstream>
 #include "ColorEnum.hpp"
 #include "Square.hpp"
 
@@ -32,6 +33,7 @@ public:
     void addHouse();
     void addHotel();
     void display(std::ostream& os) const override;
+    std::string display(std::ostringstream& os) const;
 
        
     

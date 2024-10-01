@@ -297,3 +297,45 @@ bool Player::AddChance()
 
 
  }
+
+ std::string Player::displayLong() const {
+
+    std::ostringstream os; 
+
+    os << "Player status: " << "name: " << name << "," << " money: " << money << 
+    ", current Position on board: " << currentPosition << ", Own Electric Company?" << (hasOwnElectricCompany ? " Yes" : " No")
+    <<  ", Own Water Company?" << (hasOwnWaterCompany ? " Yes" : " No") <<std::endl;
+
+    // Loop through all streets and call their display method
+    os << "Owned Streets:" << std::endl;
+    if(streets.size() ==0)
+    {
+         os << "No streets yet." << std::endl;
+    }
+    else{
+        
+        for (const Street& street : streets) {
+        os << street.display(os); // Call the display method for each street
+        }
+
+    }
+
+   // Loop through all trains and call their display method
+    os << "Owned Trains:" << std::endl;
+    if(trains.size() ==0)
+    {
+         os << "No trains yet." << std::endl;
+    }
+    else{
+    
+    for (const Train& train : trains) {
+        os<< train.display(os); // Call the display method for each train
+    }
+
+    os<< "Position On Board: " << currentPosition;
+
+
+    }
+  
+    return os.str(); // Return the string representation of the player's status
+}

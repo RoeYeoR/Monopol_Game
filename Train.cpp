@@ -14,3 +14,11 @@
 
  }
 
+ std::string Train::display(std::ostringstream& os) const
+{
+    
+     os << "Train Square: " << name << std::endl;
+     return os.str();
+
+}
+

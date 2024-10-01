@@ -555,7 +555,7 @@ void MonopolManager::UpgradeStreet(Street* street)
         // Check if texture is already loaded
         if (textures.find(iconName) == textures.end()) {
             sf::Texture iconTexture;
-            if (!iconTexture.loadFromFile("C:\\Users\\Roi\\Desktop\\ComputerScience\\YearB\\SemesterB\\Systems2\\Systems2_FinalProject\\Icons\\" + iconName + ".png")) {
+            if (!iconTexture.loadFromFile("Icons\\" + iconName + ".png")) {
                 std::cerr << "Error loading icon texture: " << iconName << "\n";
                 return; // Handle error
             }

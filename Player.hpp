@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include <sstream>
 #include "Street.hpp"
 #include "Chance.hpp"
 #include "Train.hpp"
@@ -56,4 +57,5 @@ class Player{
         bool PurchaseElectricCompany(ElectricCompany* electricCompany);
         void displayShort(std::ostream& os) const;
         void displayLong(std::ostream& os) const;
+        std::string displayLong() const;
 };

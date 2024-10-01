@@ -6,225 +6,163 @@
 #include <vector>
 
 #include "MonopolManager.hpp"
-#include "Board.hpp" 
+#include "Board.hpp"
+#include "Player.hpp"  
 #include "EdgeSquare.hpp" 
 
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(1000, 1000), "MonopolGame");
 
-     // Get window size
-    sf::Vector2u windowSize = window.getSize();
+sf::RenderWindow window(sf::VideoMode(1000, 1000), "MonopolGame");
 
-     const int boardSize = 11;
+// Get window size
+sf::Vector2u windowSize = window.getSize();
 
-     // Calculate cell size dynamically based on window dimensions
-    const float cellWidth = windowSize.x / static_cast<float>(boardSize);
-    const float cellHeight = windowSize.y / static_cast<float>(boardSize);
+const int boardSize = 11;
 
-    if (cellWidth <= 0 || cellHeight <= 0) {
-    std::cerr << "Cell size is zero or negative!" << std::endl;
-    return -1; // Handle error
-    }
+// Calculate cell size dynamically based on window dimensions
+const float cellWidth = windowSize.x / static_cast<float>(boardSize);
+const float cellHeight = windowSize.y / static_cast<float>(boardSize);
 
-    //  // Create a music object
-    // sf::Music music;
+if (cellWidth <= 0 || cellHeight <= 0) {
+std::cerr << "Cell size is zero or negative!" << std::endl;
+return -1; // Handle error
+}
 
-    // // Load music from a file (WAV, OGG, or FLAC)
-    // if (!music.openFromFile("C:\\Users\\Roi\\Desktop\\ComputerScience\\YearB\\SemesterB\\Systems2\\Systems2_FinalProject\\Audio\\GameMusic.ogg"))
-    // {
-    //     std::cerr << "Error loading music file\n";
-    //     return -1;
-    // }
+//  // Create a music object
+// sf::Music music;
 
-    // // Play the music
-    // music.play();
+// // Load music from a file (WAV, OGG, or FLAC)
+// if (!music.openFromFile("C:\\Users\\Roi\\Desktop\\ComputerScience\\YearB\\SemesterB\\Systems2\\Systems2_FinalProject\\Audio\\GameMusic.ogg"))
+// {
+//     std::cerr << "Error loading music file\n";
+//     return -1;
+// }
 
-    // // Set music properties (optional)
-    // music.setLoop(true); // Set the music to loop
+// // Play the music
+// music.play();
+
+// // Set music properties (optional)
+// music.setLoop(true); // Set the music to loop
 
 
-    //Get Font
-    sf::Font font;
-    if (!font.loadFromFile("C:\\Users\\Roi\\Desktop\\ComputerScience\\YearB\\SemesterB\\Systems2\\Systems2_FinalProject\\Fonts\\GameFont2.ttf")) 
-    { 
-        std::cerr << "Error loading font\n"; // Print error message
+//Get Font
+sf::Font font;
+if (!font.loadFromFile("Fonts\\GameFont2.ttf")) 
+{ 
+std::cerr << "Error loading font\n"; // Print error message
+return -1; // Handle error
+}
+// //Get Textures
+// sf::Texture iconTexture;
+// if (!iconTexture.loadFromFile("C:\\Users\\Roi\\Desktop\\ComputerScience\\YearB\\SemesterB\\Systems2\\Systems2_FinalProject\\Icons\\Start.png")) { // Update with your icon path
+//     std::cerr << "Error loading icon texture\n";
+//     return -1; // Handle error
+// }
+
+
+// Flag to check if the number of players is entered
+bool isNumPlayersEntered = false;
+int numPlayers = 0;
+int maxNumOfPlayers = 8;
+// Placeholder for player icons
+std::vector<sf::Sprite> playerIcons;
+std::vector<sf::Texture> playerTextures(maxNumOfPlayers);
+
+std::vector<std::shared_ptr<Player>> players;
+int currentPlayerIndex = 0;
+bool hasDoneTurn = false;
+
+
+// Welcome text
+sf::Text WelcomeText;
+WelcomeText.setFont(font);
+WelcomeText.setCharacterSize(24);
+WelcomeText.setFillColor(sf::Color::Black);
+WelcomeText.setString("Welcome To Monopl Game");
+
+
+sf::FloatRect textBoundsWelcome = WelcomeText.getLocalBounds();
+WelcomeText.setOrigin(textBoundsWelcome.width / 2, textBoundsWelcome.height / 2); // Center the origin
+WelcomeText.setPosition(windowSize.x / 2, windowSize.y / 2 - 350); // Position it in the center of the window
+
+
+// Instruction text
+sf::Text InstructionText;
+InstructionText.setFont(font);
+InstructionText.setCharacterSize(24);
+InstructionText.setFillColor(sf::Color::Black);
+InstructionText.setString("Enter number of players (2-8):");
+
+
+sf::FloatRect textBoundsInstruction = InstructionText.getLocalBounds();
+InstructionText.setOrigin(textBoundsInstruction.width / 2, textBoundsInstruction.height / 2); // Center the origin
+InstructionText.setPosition(windowSize.x / 2, windowSize.y / 2 - 100); // Position it in the center of the window
+
+
+// Instruction text
+sf::Text InstructionSpaceText;
+InstructionSpaceText.setFont(font);
+InstructionSpaceText.setCharacterSize(24);
+InstructionSpaceText.setFillColor(sf::Color::Black);
+InstructionSpaceText.setString("PRESS SPACE TO CHANGE TURN TO NEXT PLAYER");
+
+
+sf::FloatRect textBoundsInstructionSpace = InstructionSpaceText.getLocalBounds();
+InstructionSpaceText.setOrigin(textBoundsInstructionSpace.width / 2, textBoundsInstructionSpace.height / 2); // Center the origin
+InstructionSpaceText.setPosition(windowSize.x / 2, windowSize.y / 2 + 400); 
+
+
+
+// Status text
+sf::Text StatusText;
+StatusText.setFont(font);
+StatusText.setCharacterSize(24);
+StatusText.setFillColor(sf::Color::Black);
+StatusText.setString("Status...");
+
+
+sf::FloatRect textBoundsStatus = StatusText.getLocalBounds();
+StatusText.setOrigin(textBoundsStatus.width / 2, textBoundsStatus.height / 2); // Center the origin
+StatusText.setPosition(windowSize.x / 2, windowSize.y / 2 - 200); // Position it in the center of the window
+
+
+// Status text
+sf::Text StatusPlayerTurnText;
+StatusPlayerTurnText.setFont(font);
+StatusPlayerTurnText.setCharacterSize(24);
+StatusPlayerTurnText.setFillColor(sf::Color::Black);
+StatusPlayerTurnText.setString("Player 1's Turn");
+
+
+sf::FloatRect textBoundsStatusPlayerTurn = StatusPlayerTurnText.getLocalBounds();
+StatusPlayerTurnText.setOrigin(textBoundsStatusPlayerTurn.width / 2, textBoundsStatusPlayerTurn.height / 2); // Center the origin
+StatusPlayerTurnText.setPosition(windowSize.x / 2, windowSize.y / 2 - 250); // Position it in the center of the window
+
+
+// Text for user input
+sf::Text playerInputText;
+playerInputText.setFont(font);
+playerInputText.setCharacterSize(24);
+playerInputText.setFillColor(sf::Color::Black);
+playerInputText.setPosition(windowSize.x / 2 - 50, windowSize.y / 2);
+std::string input = "";
+
+
+
+for (int i = 0; i < maxNumOfPlayers; i++)
+{
+    sf::Texture playerTexture;
+    if (!playerTexture.loadFromFile("Icons\\Player" + std::to_string(i+1) + ".png")) 
+    {
+        std::cerr << "Error loading player texture " << "\n";
         return -1; // Handle error
     }
-    // //Get Textures
-    // sf::Texture iconTexture;
-    // if (!iconTexture.loadFromFile("C:\\Users\\Roi\\Desktop\\ComputerScience\\YearB\\SemesterB\\Systems2\\Systems2_FinalProject\\Icons\\Start.png")) { // Update with your icon path
-    //     std::cerr << "Error loading icon texture\n";
-    //     return -1; // Handle error
-    // }
+    playerTextures[i] = std::move(playerTexture);
+}
 
-
-       // Instruction text
-    sf::Text WelcomeText;
-    WelcomeText.setFont(font);
-    WelcomeText.setCharacterSize(24);
-    WelcomeText.setFillColor(sf::Color::Black);
-    WelcomeText.setString("Enter number of players (2-8):");
-    
-   
-    sf::FloatRect textBounds = WelcomeText.getLocalBounds();
-    WelcomeText.setOrigin(textBounds.width / 2, textBounds.height / 2); // Center the origin
-    WelcomeText.setPosition(windowSize.x / 2, windowSize.y / 2 - 100); // Position it in the center of the window
-
-
-    // Text for user input
-    sf::Text playerInputText;
-    playerInputText.setFont(font);
-    playerInputText.setCharacterSize(24);
-    playerInputText.setFillColor(sf::Color::Black);
-    playerInputText.setPosition(windowSize.x / 2 - 50, windowSize.y / 2);
-    std::string input = "";
-    
-    // Flag to check if the number of players is entered
-    bool isNumPlayersEntered = false;
-    int numPlayers = 0;
-    int maxNumOfPlayers = 8;
-    // Placeholder for player icons
-    std::vector<sf::Sprite> playerIcons;
-    std::vector<sf::Texture> playerTexture;
-
-    for (int i = 0; i < maxNumOfPlayers; i++)
-    {
-        sf::Texture texture;
-        if (!texture.loadFromFile("C:\\Users\\Roi\\Desktop\\ComputerScience\\YearB\\SemesterB\\Systems2\\Systems2_FinalProject\\Icons\\Player" + std::to_string(i+1) + ".png")) 
-        {
-                std::cerr << "Error loading player texture " << "\n";
-                return -1; // Handle error
-        }
-       playerTexture.push_back(texture);
-    }
-    
-   
-    std::vector<std::vector<sf::RectangleShape>> grid(boardSize, std::vector<sf::RectangleShape>(boardSize));
-    std::vector<std::vector<sf::Text>> textGrid(boardSize, std::vector<sf::Text>(boardSize));
-    std::vector<std::vector<sf::Sprite>> iconGrid(boardSize, std::vector<sf::Sprite>(boardSize)); // Grid for icons
-    std::vector<std::vector<std::shared_ptr<Square>>>& board = Board::getInstance().getBoard();
-    //board initialization
-    for (int row = 0; row < boardSize; ++row) {
-        for (int col = 0; col < boardSize; ++col) {
-           
-            sf::RectangleShape square(sf::Vector2f(cellWidth, cellHeight));
-            square.setPosition(col * cellWidth, row * cellHeight);
-            square.setFillColor(sf::Color(241, 231, 254)); // Default color
-
-         if (row == 0 || row == boardSize - 1 || col == 0 || col == boardSize - 1)
-         {
-            // Assign a different color based on the type of square
-            auto squarePtr = board[row][col];  
-           
-            if (dynamic_cast<EdgeSquare*>(squarePtr.get())) {
-                square.setFillColor(sf::Color::Green); // Edge squares
-                MonopolManager::getInstance().CheckEdgeSquareType(squarePtr);
-            
-                 
-            }
-            else if (auto street = dynamic_cast<Street*>(squarePtr.get())) {
-                sf::Color streetColor = sf::Color::White;
-                switch(street->getColor())
-                {
-                    case Color::Azure:
-                        streetColor = sf::Color(0, 127, 255);
-                        break;
-                    case Color::Blue:
-                        streetColor = sf::Color(40, 67, 135);  
-                         break;
-                    case Color::Brown:
-                        streetColor = sf::Color(130, 94, 92);  
-                         break;  
-                    case Color::Green:
-                        streetColor = sf::Color(195, 255, 104); 
-                         break;
-                    case Color::Orange:
-                        streetColor = sf::Color(251, 192, 147);  
-                         break;
-                    case Color::Pink:
-                        streetColor = sf::Color(227, 61, 148);
-                         break;  
-                    case Color::Red:
-                        streetColor = sf::Color(210, 77, 87);
-                         break;  
-                    case Color::Yellow:
-                        streetColor = sf::Color(254, 241, 96);
-                         break;  
-
-                }
-                square.setFillColor(streetColor); // Streets
-            }
-            else if (dynamic_cast<Train*>(squarePtr.get())) {
-                square.setFillColor(sf::Color::Red); // Train stations
-                 MonopolManager::getInstance().SetIcon(squarePtr,"Train");
-            }
-            else if (dynamic_cast<Chance*>(squarePtr.get())) {
-                square.setFillColor(sf::Color::Cyan); // Chance
-                MonopolManager::getInstance().SetIcon(squarePtr,"ChanceCard");
-            }
-            else if (dynamic_cast<CommunityChest*>(squarePtr.get())) {
-                square.setFillColor(sf::Color::Blue); // Community Chest
-                MonopolManager::getInstance().SetIcon(squarePtr,"TreasureChestCard");
-            }
-            else if (dynamic_cast<Tax*>(squarePtr.get())) {
-                square.setFillColor(sf::Color::Magenta); // Taxes
-                MonopolManager::getInstance().SetIcon(squarePtr,"Tax");
-            }
-              else if (dynamic_cast<ElectricCompany*>(squarePtr.get())) {
-                square.setFillColor(sf::Color::Magenta); // Taxes
-                MonopolManager::getInstance().SetIcon(squarePtr,"Electric");
-            }
-             else if (dynamic_cast<WaterCompany*>(squarePtr.get())) {
-                square.setFillColor(sf::Color::Magenta); // Taxes
-                MonopolManager::getInstance().SetIcon(squarePtr,"Water");
-            }
-
-
-            // Store the square
-            grid[row][col] = square;
-
-          sf::Sprite iconSprite = squarePtr->getIcon();
-          if (iconSprite.getTexture()) {
-            float iconSize = cellWidth * 0.5f; // Adjust the size of the icon as needed
-            iconSprite.setScale(iconSize / iconSprite.getTexture()->getSize().x,
-                                iconSize / iconSprite.getTexture()->getSize().y);
-
-            // Center the icon within the square
-            iconSprite.setPosition(
-                col * cellWidth + (cellWidth - iconSprite.getGlobalBounds().width) / 2,
-                row * cellHeight + (cellHeight - iconSprite.getGlobalBounds().height) / 2);
-
-            // Store the sprite in the icon grid
-            iconGrid[row][col] = iconSprite;
-          }
-
-            // Create and set up the text
-            sf::Text text;
-            text.setFont(font);
-            text.setCharacterSize(10); // Adjust size as needed
-            text.setFillColor(sf::Color::Black); // Text color
-
-            // Example text, you can set it to a property of your Square or any other identifier
-            text.setString(squarePtr->getName()); 
-            text.setPosition(
-                col * cellWidth + (cellWidth - text.getGlobalBounds().width) / 2, // Center horizontally
-                row * cellHeight + (cellHeight - text.getGlobalBounds().height) / 2);  // Center vertically
- 
-            
-            // Store the text in the text grid
-            textGrid[row][col] = text;
-          }
-          else
-          {
-            // Store Default square
-            grid[row][col] = square;
-          }
-        }
-    }
-
-    // Create two buttons: Player Status and Roll the Dice
+// Create two buttons: Player Status and Roll the Dice
 sf::RectangleShape playerStatusButton(sf::Vector2f(200.f, 50.f));
 playerStatusButton.setFillColor(sf::Color(100, 100, 250)); // Blue color
 playerStatusButton.setPosition(windowSize.x / 2 - 100, windowSize.y / 2 + 50); // Position in the center
@@ -248,126 +186,329 @@ rollDiceText.setFillColor(sf::Color::White);
 rollDiceText.setPosition(rollDiceButton.getPosition().x + 20, rollDiceButton.getPosition().y + 10);
 
 
-   
-    while (window.isOpen())
+
+std::vector<std::vector<sf::RectangleShape>> grid(boardSize, std::vector<sf::RectangleShape>(boardSize));
+std::vector<std::vector<sf::Text>> textGrid(boardSize, std::vector<sf::Text>(boardSize));
+std::vector<std::vector<sf::Sprite>> iconGrid(boardSize, std::vector<sf::Sprite>(boardSize)); // Grid for icons
+std::vector<std::vector<std::shared_ptr<Square>>>& board = Board::getInstance().getBoard();
+//board initialization
+for (int row = 0; row < boardSize; ++row) {
+for (int col = 0; col < boardSize; ++col) {
+    
+    sf::RectangleShape square(sf::Vector2f(cellWidth, cellHeight));
+    square.setPosition(col * cellWidth, row * cellHeight);
+    square.setFillColor(sf::Color(241, 231, 254)); // Default color
+
+    if (row == 0 || row == boardSize - 1 || col == 0 || col == boardSize - 1)
     {
-        sf::Event event;
-        while (window.pollEvent(event))
+    // Assign a different color based on the type of square
+    auto squarePtr = board[row][col];  
+    
+    if (dynamic_cast<EdgeSquare*>(squarePtr.get())) {
+        square.setFillColor(sf::Color::Green); // Edge squares
+        MonopolManager::getInstance().CheckEdgeSquareType(squarePtr);
+    
+            
+    }
+    else if (auto street = dynamic_cast<Street*>(squarePtr.get())) {
+        sf::Color streetColor = sf::Color::White;
+        switch(street->getColor())
         {
-            if (event.type == sf::Event::Closed)
-            {
-                window.close();
-            }
+            case Color::Azure:
+                streetColor = sf::Color(0, 127, 255);
+                break;
+            case Color::Blue:
+                streetColor = sf::Color(40, 67, 135);  
+                    break;
+            case Color::Brown:
+                streetColor = sf::Color(130, 94, 92);  
+                    break;  
+            case Color::Green:
+                streetColor = sf::Color(195, 255, 104); 
+                    break;
+            case Color::Orange:
+                streetColor = sf::Color(251, 192, 147);  
+                    break;
+            case Color::Pink:
+                streetColor = sf::Color(227, 61, 148);
+                    break;  
+            case Color::Red:
+                streetColor = sf::Color(210, 77, 87);
+                    break;  
+            case Color::Yellow:
+                streetColor = sf::Color(254, 241, 96);
+                    break;  
 
-
-             // Handle text input for number of players
-            if (!isNumPlayersEntered && event.type == sf::Event::TextEntered) {
-                if (event.text.unicode >= '0' && event.text.unicode <= '9') {
-                    input += static_cast<char>(event.text.unicode);
-                    playerInputText.setString(input);
-                }
-                else if (event.text.unicode == '\b' && !input.empty()) { // Handle backspace
-                    input.pop_back();
-                    playerInputText.setString(input);
-                }
-                else if (event.text.unicode == 13 && !input.empty()) { // Enter key pressed
-                    numPlayers = std::stoi(input);
-                    if (numPlayers >= 2 && numPlayers <= 8) {
-                        isNumPlayersEntered = true;
-
-                        // Generate player icons
-                        for (int i = 0; i < numPlayers; ++i) {
-                            sf::Sprite playerIcon;
-                            playerIcon.setPosition(10 * cellWidth, 10 * cellHeight); // Starting square (10,10)
-                            playerIcon.setTexture(playerTexture[i]);
-                            playerIcons.push_back(playerIcon);
-                        }
-
-                        WelcomeText.setString("Players have been placed on the start square.");
-                    } else {
-                        input = ""; // Reset invalid input
-                        playerInputText.setString(input);
-                        WelcomeText.setString("Please enter a valid number (2-8):");
-                    }
-
-                }
-            }
-                
-                // Detect clicks on the buttons
-            if (event.type == sf::Event::MouseButtonPressed)
-            {
-                if (event.mouseButton.button == sf::Mouse::Left) 
-                {
-                    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-
-                    // Check if Player Status button is clicked
-                    if (playerStatusButton.getGlobalBounds().contains(mousePos.x, mousePos.y)) 
-                    {
-                        // Show player status
-                        WelcomeText.setString("Player Status clicked!");
-                    }
-
-                    // Check if Roll the Dice button is clicked
-                    if (rollDiceButton.getGlobalBounds().contains(mousePos.x, mousePos.y)) 
-                    {
-                        // Roll the dice
-                        int diceResult = MonopolManager::getInstance().RollDice();
-                        WelcomeText.setString("You rolled a " + std::to_string(diceResult) + "!");
-                    }
-                }
-            }
         }
-
-       
-        window.clear();
-
-          // Draw all the grid squares
-        for (int row = 0; row < boardSize; ++row) 
-        {
-            for (int col = 0; col < boardSize; ++col) 
-            {
-            // // Check if the square is initialized (you can add your specific condition here)
-            // auto squarePtr = board[row][col]; // Get the square pointer
-            // if (squarePtr) 
-                window.draw(grid[row][col]); // Draw the square
-                window.draw(textGrid[row][col]); // Draw the text
-
-                 // Draw the icon if it exists
-                if (iconGrid[row][col].getTexture()) { // Check if the icon is initialized
-                    window.draw(iconGrid[row][col]); // Draw the icon
-                }
-               
-           }
-        }
-
-
-        // Draw the Welcome text
-        window.draw(WelcomeText);
-
-          if (!isNumPlayersEntered) {
-            window.draw(playerInputText);
-        }
-
-        // Draw player icons if the number of players is entered
-    if (isNumPlayersEntered)
-     {
-        for (auto& playerIcon : playerIcons)
-        {
-            window.draw(playerIcon);
-        }
-
-        window.draw(playerStatusButton);
-        window.draw(playerStatusText);
-        window.draw(rollDiceButton);
-        window.draw(rollDiceText);
-        
+        square.setFillColor(streetColor); // Streets
+    }
+    else if (dynamic_cast<Train*>(squarePtr.get())) {
+        square.setFillColor(sf::Color::Red); // Train stations
+            MonopolManager::getInstance().SetIcon(squarePtr,"Train");
+    }
+    else if (dynamic_cast<Chance*>(squarePtr.get())) {
+        square.setFillColor(sf::Color::Cyan); // Chance
+        MonopolManager::getInstance().SetIcon(squarePtr,"ChanceCard");
+    }
+    else if (dynamic_cast<CommunityChest*>(squarePtr.get())) {
+        square.setFillColor(sf::Color::Blue); // Community Chest
+        MonopolManager::getInstance().SetIcon(squarePtr,"TreasureChestCard");
+    }
+    else if (dynamic_cast<Tax*>(squarePtr.get())) {
+        square.setFillColor(sf::Color::Magenta); // Taxes
+        MonopolManager::getInstance().SetIcon(squarePtr,"Tax");
+    }
+        else if (dynamic_cast<ElectricCompany*>(squarePtr.get())) {
+        square.setFillColor(sf::Color::Magenta); // Taxes
+        MonopolManager::getInstance().SetIcon(squarePtr,"Electric");
+    }
+        else if (dynamic_cast<WaterCompany*>(squarePtr.get())) {
+        square.setFillColor(sf::Color::Magenta); // Taxes
+        MonopolManager::getInstance().SetIcon(squarePtr,"Water");
     }
 
-    window.display();
+
+    // Store the square
+    grid[row][col] = square;
+
+    sf::Sprite iconSprite = squarePtr->getIcon();
+    if (iconSprite.getTexture()) {
+    float iconSize = cellWidth * 0.5f; // Adjust the size of the icon as needed
+    iconSprite.setScale(iconSize / iconSprite.getTexture()->getSize().x,
+                        iconSize / iconSprite.getTexture()->getSize().y);
+
+    // Center the icon within the square
+    iconSprite.setPosition(
+        col * cellWidth + (cellWidth - iconSprite.getGlobalBounds().width) / 2,
+        row * cellHeight + (cellHeight - iconSprite.getGlobalBounds().height) / 2);
+
+    // Store the sprite in the icon grid
+    iconGrid[row][col] = iconSprite;
+    }
+
+    // Create and set up the text
+    sf::Text text;
+    text.setFont(font);
+    text.setCharacterSize(10); // Adjust size as needed
+    text.setFillColor(sf::Color::Black); // Text color
+
+    // Example text, you can set it to a property of your Square or any other identifier
+    text.setString(squarePtr->getName()); 
+    text.setPosition(
+        col * cellWidth + (cellWidth - text.getGlobalBounds().width) / 2, // Center horizontally
+        row * cellHeight + (cellHeight - text.getGlobalBounds().height) / 2);  // Center vertically
+
+    
+    // Store the text in the text grid
+    textGrid[row][col] = text;
+    }
+    else
+    {
+    // Store Default square
+    grid[row][col] = square;
+    }
+}
 }
 
-    return 0;
+
+while (window.isOpen())
+{
+sf::Event event;
+while (window.pollEvent(event))
+{
+    if (event.type == sf::Event::Closed)
+    {
+        window.close();
+    }
+
+        // Handle text input for number of players
+    if (!isNumPlayersEntered && event.type == sf::Event::TextEntered) {
+        if (event.text.unicode >= '0' && event.text.unicode <= '9') {
+            input += static_cast<char>(event.text.unicode);
+            playerInputText.setString(input);
+        }
+        else if (event.text.unicode == '\b' && !input.empty()) { // Handle backspace
+            input.pop_back();
+            playerInputText.setString(input);
+        }
+        else if (event.text.unicode == 13 && !input.empty()) { // Enter key pressed
+            numPlayers = std::stoi(input);
+            if (numPlayers >= 2 && numPlayers <= 8) {
+                isNumPlayersEntered = true;
+
+            // Constants for the starting square position
+            const float startX = 10 * cellWidth;
+            const float startY = 10 * cellHeight;
+
+            // Calculate dimensions based on the number of players
+            const float spacingX = cellWidth / (numPlayers <= 4 ? 2 : 4);  // Adjust spacing based on players
+            const float spacingY = cellHeight / (numPlayers <= 4 ? 2 : 4); // Adjust spacing based on players
+
+            const float scaleFactor = (numPlayers <= 4) ? 0.5f : 0.3f; 
+
+            // Generate player icons
+            for (int i = 0; i < numPlayers; ++i) {
+                
+                std::shared_ptr<Player> p = std::make_shared<Player>("Player " + std::to_string(i + 1));
+                players.push_back(p);
+
+
+               sf::Sprite playerSprite;
+               playerSprite.setTexture(playerTextures[i]);
+
+
+                playerSprite.setScale(scaleFactor, scaleFactor);
+                
+                // Calculate positions to spread the icons in the starting square
+                float offsetX = (i % 2 == 0) ? -spacingX : spacingX; 
+                float offsetY = (i < 2) ? -spacingY : spacingY;
+
+                // Set the position of the player icon based on offsets
+                playerSprite.setPosition(startX + offsetX, startY + offsetY);
+
+                // Add player icon to vector
+                playerIcons.push_back(playerSprite);
+              
+            }
+                InstructionText.setString("Players have been placed on the start square.");
+            } else {
+                input = ""; // Reset invalid input
+                playerInputText.setString(input);
+                InstructionText.setString("Please enter a valid number (2-8):");
+            }
+
+        }
+    }
+        // Detect clicks on the buttons
+    if (event.type == sf::Event::MouseButtonPressed)
+    {
+        if (event.mouseButton.button == sf::Mouse::Left) 
+        {
+            sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+
+            // Check if Player Status button is clicked
+            if (playerStatusButton.getGlobalBounds().contains(mousePos.x, mousePos.y)) 
+            {
+                std::string statusStr =  players[currentPlayerIndex]->displayLong();
+                StatusText.setString(statusStr);
+
+            }
+
+            // Check if Roll the Dice button is clicked
+            if (rollDiceButton.getGlobalBounds().contains(mousePos.x, mousePos.y) && !hasDoneTurn) 
+            {
+                // Roll the dice
+                int diceResult = MonopolManager::getInstance().RollDice();
+                InstructionText.setString("You rolled a " + std::to_string(diceResult) + "!");
+                players[currentPlayerIndex]->MoveOnBoard(diceResult);
+                Point2D& currentPos =  players[currentPlayerIndex]->getCurrentPosition();
+                std::string newPosStr = "Position On Board: " + currentPos.to_string();
+                StatusText.setString(newPosStr);
+                std::shared_ptr<Player>* p = Board::getInstance().checkSquareOwnerShip(board[currentPos.getX()][currentPos.getY()]);
+                if( p == nullptr)
+            {      
+                Board::getInstance().offerPlayerOptions(board[currentPos.getX()][currentPos.getY()]);
+            }
+            else if( *p != players[currentPlayerIndex])
+            {
+                std::shared_ptr<Square>& currentSquare =  board[currentPos.getX()][currentPos.getY()];
+                currentSquare->display(std::cout);
+                std::cout <<"This Sqaure is owned by " << (*p)->getName();
+                float calculatedPrice = MonopolManager::getInstance().getActuallBillOfSquare(currentSquare,p);  
+            
+            if(!MonopolManager::getInstance().ChargePlayer(players[currentPlayerIndex],*p,calculatedPrice))
+            {
+                std::cout<< players[currentPlayerIndex]->getName() <<" went bankrupt ..." <<std::endl << "All it's properties were passed to " 
+                << (*p)->getName() <<std::endl;
+            }
+            else
+            {
+                    std::cout << "Transfer of " << currentSquare->getPrice() <<"₪ was done Successfully!"<<std::endl;
+            }
+            }
+            else
+            {
+                Board::getInstance().offerPlayerUpgrades(board[currentPos.getX()][currentPos.getY()]);
+
+            }
+
+            hasDoneTurn = true;
+
+            }
+            else{
+                InstructionText.setString("You already did your Turn. Press Space to move on to the next Player !");
+            }
+        }
+    }
+
+    if (event.type == sf::Event::KeyPressed)
+     {
+        // Check if the pressed key is the spacebar
+        if (event.key.code == sf::Keyboard::Space) {
+            currentPlayerIndex ++;
+            currentPlayerIndex = currentPlayerIndex % numPlayers;
+            StatusPlayerTurnText.setString("Player " +std::to_string(currentPlayerIndex+1) +"'s Turn");
+            StatusText.setString("Status ...");
+            InstructionText.setString("");
+            hasDoneTurn = false;
+        }
+           
+     }
+}
+
+window.clear();
+
+    // Draw all the grid squares
+for (int row = 0; row < boardSize; ++row) 
+{
+    for (int col = 0; col < boardSize; ++col) 
+    {
+    // // Check if the square is initialized (you can add your specific condition here)
+    // auto squarePtr = board[row][col]; // Get the square pointer
+    // if (squarePtr) 
+        window.draw(grid[row][col]); // Draw the square
+        window.draw(textGrid[row][col]); // Draw the text
+
+            // Draw the icon if it exists
+        if (iconGrid[row][col].getTexture()) { // Check if the icon is initialized
+            window.draw(iconGrid[row][col]); // Draw the icon
+        }
+        
+    }
+}
+
+// Draw the Welcome text
+window.draw(WelcomeText);
+window.draw(InstructionText);
+window.draw(StatusText);
+window.draw(InstructionSpaceText);
+window.draw(StatusPlayerTurnText);
+
+
+if (!isNumPlayersEntered) {
+window.draw(playerInputText);
+}
+
+// Draw player icons if the number of players is entered
+if (isNumPlayersEntered)
+{
+
+window.draw(playerStatusButton);
+window.draw(playerStatusText);
+window.draw(rollDiceButton);
+window.draw(rollDiceText);
+
+   // Draw the player icons after placement
+    for (auto& icon : playerIcons) {
+        window.draw(icon);
+    }
+
+}
+
+window.display();
+}
+
+return 0;
 }
 
 
- 

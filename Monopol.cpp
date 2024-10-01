@@ -12,6 +12,7 @@ int main ()
     std::shared_ptr<Player> currentPlayer = nullptr; 
     Board& board = Board::getInstance();
     std::vector<std::vector<std::shared_ptr<Square>>>& actuallBoard =board.getBoard();
+   
 
     std::cout <<"Enter number of Players: " <<std::endl;
     std::cin >> numOfPlayers;

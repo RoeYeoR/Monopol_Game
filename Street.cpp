@@ -50,3 +50,11 @@ void Street::display(std::ostream& os) const
      os << "Street name: " << name << "," << "price:" << price <<  "," << "color group:" << color <<std::endl;
     
 }
+
+std::string Street::display(std::ostringstream& os) const
+{
+    
+     os <<  "Street name: " << name << "," << "price:" << price <<  "," << "color group:" << color <<std::endl;
+     return os.str();
+
+}

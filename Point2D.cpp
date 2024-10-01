@@ -38,3 +38,9 @@ std::ostream& operator<< (std::ostream& output,const Point2D& p)
      output << "["<< p.getX() << ',' << p.getY() <<"]";
      return output;
 }
+
+ std::string Point2D::to_string()
+ {
+   std::string str = "["+ std::to_string(x) + ',' + std::to_string(y) + "]";
+   return str;
+ }
