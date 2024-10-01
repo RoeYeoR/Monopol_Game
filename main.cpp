@@ -528,7 +528,6 @@ while (window.pollEvent(event))
                 InstructionText.setString("You already did your Turn. Press Space to move on to the next Player !");
             }
                 
-            
         }
                
     }
