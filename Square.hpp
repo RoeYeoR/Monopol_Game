@@ -21,7 +21,8 @@
         void setIcon(const sf::Texture& texture) { iconSprite.setTexture(texture);}
         sf::Sprite getIcon() {return iconSprite;}
         
-        virtual void display(std::ostream& os) const = 0;  // Pure virtual function for polymorphism
+        virtual void display(std::ostream& os) const = 0;  
+        virtual std::string display(std::ostringstream& os) const =0 ; 
         virtual ~Square() = default;       // Virtual destructor for proper cleanup
 
         bool operator==(const Square& other) const

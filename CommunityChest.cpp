@@ -9,3 +9,9 @@ void CommunityChest::display(std::ostream& os) const
 {
     os << "CommunityChest: " << name << std::endl;
 }
+
+std::string CommunityChest::display(std::ostringstream& os) const
+{
+    os << "CommunityChest: " << name << std::endl;
+     return os.str(); 
+}

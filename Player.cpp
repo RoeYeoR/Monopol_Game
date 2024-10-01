@@ -294,8 +294,6 @@ bool Player::AddChance()
     }
   
 
-
-
  }
 
  std::string Player::displayLong() const {

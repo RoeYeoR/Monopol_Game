@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-
+#include <sstream>
 #include "MonopolManager.hpp"
 #include "Board.hpp"
 #include "Player.hpp"  
@@ -34,7 +34,7 @@ return -1; // Handle error
 // sf::Music music;
 
 // // Load music from a file (WAV, OGG, or FLAC)
-// if (!music.openFromFile("C:\\Users\\Roi\\Desktop\\ComputerScience\\YearB\\SemesterB\\Systems2\\Systems2_FinalProject\\Audio\\GameMusic.ogg"))
+// if (!music.openFromFile("Audio\\GameMusic.ogg"))
 // {
 //     std::cerr << "Error loading music file\n";
 //     return -1;
@@ -54,12 +54,7 @@ if (!font.loadFromFile("Fonts\\GameFont2.ttf"))
 std::cerr << "Error loading font\n"; // Print error message
 return -1; // Handle error
 }
-// //Get Textures
-// sf::Texture iconTexture;
-// if (!iconTexture.loadFromFile("C:\\Users\\Roi\\Desktop\\ComputerScience\\YearB\\SemesterB\\Systems2\\Systems2_FinalProject\\Icons\\Start.png")) { // Update with your icon path
-//     std::cerr << "Error loading icon texture\n";
-//     return -1; // Handle error
-// }
+
 
 
 // Flag to check if the number of players is entered
@@ -73,7 +68,7 @@ std::vector<sf::Texture> playerTextures(maxNumOfPlayers);
 std::vector<std::shared_ptr<Player>> players;
 int currentPlayerIndex = 0;
 bool hasDoneTurn = false;
-
+bool hasPressedOnStatusButton = false;
 
 // Welcome text
 sf::Text WelcomeText;
@@ -111,7 +106,32 @@ InstructionSpaceText.setString("PRESS SPACE TO CHANGE TURN TO NEXT PLAYER");
 
 sf::FloatRect textBoundsInstructionSpace = InstructionSpaceText.getLocalBounds();
 InstructionSpaceText.setOrigin(textBoundsInstructionSpace.width / 2, textBoundsInstructionSpace.height / 2); // Center the origin
-InstructionSpaceText.setPosition(windowSize.x / 2, windowSize.y / 2 + 400); 
+InstructionSpaceText.setPosition(windowSize.x / 2, windowSize.y / 2 + 300); 
+
+
+// GameMessage text
+sf::Text GameMessageText;
+GameMessageText.setFont(font);
+GameMessageText.setCharacterSize(24);
+GameMessageText.setFillColor(sf::Color::Black);
+GameMessageText.setString("Game Message ...");
+
+
+sf::FloatRect textBoundsGameMessageText = GameMessageText.getLocalBounds();
+GameMessageText.setOrigin(textBoundsGameMessageText.width / 2, textBoundsGameMessageText.height / 2); // Center the origin
+GameMessageText.setPosition(windowSize.x / 2, windowSize.y / 2 + 150); 
+
+// GameMessage2 text
+sf::Text GameMessage2Text;
+GameMessage2Text.setFont(font);
+GameMessage2Text.setCharacterSize(24);
+GameMessage2Text.setFillColor(sf::Color::Black);
+GameMessage2Text.setString("Game Message 2 ...");
+
+
+sf::FloatRect textBoundsGameMessage2Text = GameMessage2Text.getLocalBounds();
+GameMessage2Text.setOrigin(textBoundsGameMessage2Text.width / 2, textBoundsGameMessage2Text.height / 2); // Center the origin
+GameMessage2Text.setPosition(windowSize.x / 2, windowSize.y / 2 + 180); 
 
 
 
@@ -169,7 +189,7 @@ playerStatusButton.setPosition(windowSize.x / 2 - 100, windowSize.y / 2 + 50); /
 
 sf::Text playerStatusText;
 playerStatusText.setFont(font);
-playerStatusText.setString("Player Status");
+playerStatusText.setString("Status");
 playerStatusText.setCharacterSize(24);
 playerStatusText.setFillColor(sf::Color::White);
 playerStatusText.setPosition(playerStatusButton.getPosition().x + 20, playerStatusButton.getPosition().y + 10); // Center the text
@@ -389,8 +409,19 @@ while (window.pollEvent(event))
             // Check if Player Status button is clicked
             if (playerStatusButton.getGlobalBounds().contains(mousePos.x, mousePos.y)) 
             {
-                std::string statusStr =  players[currentPlayerIndex]->displayLong();
-                StatusText.setString(statusStr);
+                hasPressedOnStatusButton = !hasPressedOnStatusButton;
+                if(hasPressedOnStatusButton)
+                {
+                     std::string statusStr =  players[currentPlayerIndex]->displayLong();
+                     StatusText.setString(statusStr);
+                     playerStatusText.setString("Hide Status");
+                }
+                else
+                {
+                     StatusText.setString("");
+                     playerStatusText.setString("Status");
+                }
+               
 
             }
 
@@ -405,39 +436,57 @@ while (window.pollEvent(event))
                 std::string newPosStr = "Position On Board: " + currentPos.to_string();
                 StatusText.setString(newPosStr);
                 std::shared_ptr<Player>* p = Board::getInstance().checkSquareOwnerShip(board[currentPos.getX()][currentPos.getY()]);
+                std::ostringstream os;   
+
+            if (currentPos.getX() >= 0 && currentPos.getX() < 11 && currentPos.getY() >= 0 && currentPos.getY() < 11)  
+            {
+
                 if( p == nullptr)
-            {      
-                Board::getInstance().offerPlayerOptions(board[currentPos.getX()][currentPos.getY()]);
+                {      
+                    Board::getInstance().offerPlayerOptions(board[currentPos.getX()][currentPos.getY()],GameMessageText);
+                }
+                
+                else if( *p != players[currentPlayerIndex])
+                {
+                    std::shared_ptr<Square>& currentSquare =  board[currentPos.getX()][currentPos.getY()];
+                    if (currentSquare == nullptr) {
+                        InstructionText.setString("Error: Current square is not initialized.");
+                        return;
+                    }
+                    os << currentSquare->display(os);
+                    os <<"This Sqaure is owned by " << (*p)->getName();
+                    float calculatedPrice = MonopolManager::getInstance().getActuallBillOfSquare(currentSquare,p);  
+                
+                if(!MonopolManager::getInstance().ChargePlayer(players[currentPlayerIndex],*p,calculatedPrice,GameMessageText))
+                {
+                    os<< players[currentPlayerIndex]->getName() <<" went bankrupt ..." <<std::endl << "All it's properties were passed to " 
+                    << (*p)->getName() <<std::endl;
+                }
+                else
+                {
+                    os << "Transfer of " << currentSquare->getPrice() <<"₪ was done Successfully!"<<std::endl;
+                }
+                }
+                else
+                {
+                    Board::getInstance().offerPlayerUpgrades(board[currentPos.getX()][currentPos.getY()],GameMessageText);
+
+                }
+                hasDoneTurn = true;
+
+                if(os.str().length()>0)
+                {
+                    GameMessage2Text.setString(os.str());
+                }
+
             }
-            else if( *p != players[currentPlayerIndex])
-            {
-                std::shared_ptr<Square>& currentSquare =  board[currentPos.getX()][currentPos.getY()];
-                currentSquare->display(std::cout);
-                std::cout <<"This Sqaure is owned by " << (*p)->getName();
-                float calculatedPrice = MonopolManager::getInstance().getActuallBillOfSquare(currentSquare,p);  
+                
             
-            if(!MonopolManager::getInstance().ChargePlayer(players[currentPlayerIndex],*p,calculatedPrice))
-            {
-                std::cout<< players[currentPlayerIndex]->getName() <<" went bankrupt ..." <<std::endl << "All it's properties were passed to " 
-                << (*p)->getName() <<std::endl;
             }
-            else
-            {
-                    std::cout << "Transfer of " << currentSquare->getPrice() <<"₪ was done Successfully!"<<std::endl;
-            }
-            }
-            else
-            {
-                Board::getInstance().offerPlayerUpgrades(board[currentPos.getX()][currentPos.getY()]);
-
-            }
-
-            hasDoneTurn = true;
-
-            }
-            else{
-                InstructionText.setString("You already did your Turn. Press Space to move on to the next Player !");
-            }
+                else
+                {
+                    InstructionText.setString("You already did your Turn. Press Space to move on to the next Player !");
+                }
         }
     }
 
@@ -483,7 +532,8 @@ window.draw(InstructionText);
 window.draw(StatusText);
 window.draw(InstructionSpaceText);
 window.draw(StatusPlayerTurnText);
-
+window.draw(GameMessageText); 
+window.draw(GameMessage2Text);
 
 if (!isNumPlayersEntered) {
 window.draw(playerInputText);

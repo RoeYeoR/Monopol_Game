@@ -8,3 +8,9 @@ void ElectricCompany::display(std::ostream& os) const
 {
     os << name << std::endl;
 }
+
+std::string ElectricCompany::display(std::ostringstream& os) const
+{
+    os << name << std::endl;
+    return os.str();
+}

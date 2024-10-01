@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Square.hpp"
+#include <sstream>
 
 using namespace std;
 
@@ -25,5 +26,6 @@ class EdgeSquare : public Square {
         EdgeSquare(std::string name,EdgeSquareType esType);
         EdgeSquareType getType();
         virtual void display(std::ostream& os) const override;
+        std::string display(std::ostringstream& os) const override;
 
 };

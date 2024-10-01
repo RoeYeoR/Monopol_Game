@@ -7,3 +7,11 @@ void Tax::display(std::ostream& os) const
 {
     os << "Tax: " << name << std::endl;
 }
+
+ std::string Tax::display(std::ostringstream& os) const
+{
+    
+     os << "Tax Square: " << name << std::endl;
+     return os.str();
+
+}

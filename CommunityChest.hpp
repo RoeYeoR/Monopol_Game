@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <sstream>
 #include "Square.hpp"
 
 class CommunityChest :public Square {
@@ -12,5 +13,6 @@ class CommunityChest :public Square {
         CommunityChest();
         CommunityChest(std::string name);
         void display(std::ostream& os) const override;
+        std::string display(std::ostringstream& os) const override;
 
 };

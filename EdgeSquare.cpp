@@ -14,3 +14,9 @@ EdgeSquare::EdgeSquare(std::string name,EdgeSquareType esType) :Square(name), ty
     os << "EdgeSquare: " << type << std::endl;
 
  }
+
+  std::string EdgeSquare::display(std::ostringstream& os) const 
+ {
+    os << "EdgeSquare: " << type << std::endl;
+    return os.str();
+ }
