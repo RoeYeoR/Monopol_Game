@@ -102,10 +102,10 @@ void Board::offerPlayerOptions(const std::shared_ptr<Square>& square,sf::Text& g
     
     if (auto street = dynamic_cast<Street*>(square.get())) {
         messageStream << "It's a StreetSquare.\n";
-        MonopolManager::getInstance().BuyStreet(street, gameMessage);  // Pass the text object
+        MonopolManager::getInstance().BuyStreet(street);  // Pass the text object
     } else if (auto tax = dynamic_cast<Tax*>(square.get())) {
         messageStream << "It's a TaxSquare.\n";
-        MonopolManager::getInstance().CheckTaxPrice(tax, gameMessage);
+        MonopolManager::getInstance().CheckTaxPrice(tax);
     } else if (auto chance = dynamic_cast<Chance*>(square.get())) {
         messageStream << "It's a ChanceSquare.\n";
         MonopolManager::getInstance().AddChance();
@@ -114,16 +114,16 @@ void Board::offerPlayerOptions(const std::shared_ptr<Square>& square,sf::Text& g
         MonopolManager::getInstance().AddCommunityChest();
     } else if (auto train = dynamic_cast<Train*>(square.get())) {
         messageStream << "It's a TrainSquare.\n";
-        MonopolManager::getInstance().BuyTrain(train, gameMessage);
+        MonopolManager::getInstance().BuyTrain(train);
     } else if (auto waterCompany = dynamic_cast<WaterCompany*>(square.get())) {
         messageStream << "It's a WaterCompanySquare.\n";
-        MonopolManager::getInstance().BuyWaterCompany(waterCompany, gameMessage);
+        MonopolManager::getInstance().BuyWaterCompany(waterCompany);
     } else if (auto electricCompany = dynamic_cast<ElectricCompany*>(square.get())) {
         messageStream << "It's an ElectricCompanySquare.\n";
-        MonopolManager::getInstance().BuyElectricCompanyOwner(electricCompany, gameMessage);
+        MonopolManager::getInstance().BuyElectricCompanyOwner(electricCompany);
     } else if (auto edgeSquare = dynamic_cast<EdgeSquare*>(square.get())) {
         messageStream << "It's an EdgeSquare.\n";
-        MonopolManager::getInstance().CheckEdgeSquare(edgeSquare, gameMessage);
+        MonopolManager::getInstance().CheckEdgeSquare(edgeSquare);
     } else {
         messageStream << "It's a default Square.\n";
     }
@@ -138,7 +138,7 @@ void Board::offerPlayerUpgrades(const std::shared_ptr<Square>& square,sf::Text& 
      std::ostringstream messageStream;
     if (auto street = dynamic_cast<Street*>(square.get())) {
         messageStream << "This Street belongs to you." << std::endl;
-        MonopolManager::getInstance().UpgradeStreet(street,gameMessage);
+        MonopolManager::getInstance().UpgradeStreet(street);
     } 
      else {
         messageStream << "This Square can not be Upgraded." << std::endl;

@@ -148,27 +148,22 @@ std::shared_ptr<Player>* MonopolManager::CheckStreetOwner(const std::shared_ptr<
 
 }
 
-void MonopolManager::CheckTaxPrice(Tax* tax, sf::Text& gameMessage) {
-    std::ostringstream messageStream;  // Create a string stream to accumulate the output message
-
-    messageStream << "You need to pay " << tax->getPrice() << " to the bank.\n";
-    messageStream << "Current money: " << currentPlayer->getMoney() << "\n";
-
-    if (currentPlayer->getMoney() < tax->getPrice()) {
-        messageStream << "You don't have enough money to pay the bank. Deleting your properties...\n";
-        if (DeleteAllProperties()) {
-            messageStream << currentPlayer->getName() << " went bankrupt and finished the game!...\n";
+void MonopolManager::CheckTaxPrice(Tax* tax)
+{
+    std::cout << "You need to pay  " << tax->getPrice() << " to the bank" << std::endl;
+    std::cout << "current money:  " << currentPlayer->getMoney()<< std::endl;
+    if(currentPlayer->getMoney() < tax->getPrice())
+    {
+        std::cout<<"You don't have enouge money to pay for the bank. deleting your properties ..."<<std::endl;
+        if(DeleteAllProperties())
+        {
+            std::cout<< currentPlayer->getName() << " went bankrupt and finished the Game !...! " <<std::endl;
         }
     }
-
-    // Deduct the tax amount from the player's money
     currentPlayer->setMoney(currentPlayer->getMoney() - tax->getPrice());
-    messageStream << "Charging your money...\n";
-    messageStream << "Money remaining after charge: " << currentPlayer->getMoney() << "\n";
-
-    // Update the sf::Text object with the accumulated message
-    gameMessage.setString(messageStream.str());
+    std::cout << "Charging your money...  " << std::endl <<" money remained after charge: "<< currentPlayer->getMoney()<< std::endl;
 }
+
  void MonopolManager::AddChance()
  {
     if(currentPlayer->AddChance())
@@ -236,158 +231,137 @@ void MonopolManager::CheckTaxPrice(Tax* tax, sf::Text& gameMessage) {
 
  }
 
- void MonopolManager::BuyStreet(Street* street,sf::Text& gameMessage)
+ void MonopolManager::BuyStreet(Street* street)
  {
-    std::ostringstream messageStream;
-    messageStream << "Current money: " << currentPlayer->getMoney() << "\n";
+    int ans;
+    std::cout<<"Current money: " <<currentPlayer->getMoney()<< std::endl;
     
-    if (currentPlayer->getMoney() < street->getPrice()) {
-        messageStream << "You don't have enough money to buy this street...\n";
-    } else {
-        messageStream << "Do you want to buy this street? 1. Yes, 2. No\n";
-        int ans;
-        std::cin >> ans;  // You may want to use a more GUI-friendly method to get user input
-        
-        if (ans == 1) {
-            if (currentPlayer->PurchaseStreet(street)) {
-                messageStream << "Street: " << street->name << " was purchased successfully\n";
-                std::ostringstream playerInfo;
-               playerInfo << currentPlayer->displayLong();  // Display player info in a stringstream
-                messageStream << playerInfo.str();
-            }
-        }
+    if(currentPlayer->getMoney() < street->getPrice())
+    {
+        std::cout << "You don't have enough money to buy this street..." <<std::endl;
     }
 
-    // Update the sf::Text object with the new message
-    gameMessage.setString(messageStream.str());
+    else
+    {
+    std::cout << "Do you want to buy this street? 1.Yes , 2.No" <<std::endl;
+    std::cin >> ans; 
+    if(ans ==1)
+    {
+        if(currentPlayer->PurchaseStreet(street))
+        {
+            std::cout<<"Street: "<< street->name << " was purchased succesfully" <<std::endl;
+            currentPlayer->displayLong(std::cout);
+        }
+    }      
+    }
  }
 
-  void MonopolManager::BuyTrain(Train* train,sf::Text& gameMessage)
+  void MonopolManager::BuyTrain(Train* train)
  {
-    std::ostringstream messageStream;  // String stream to collect all the output messages
-    messageStream << "Current money: " << currentPlayer->getMoney() << "\n";
-    messageStream << "Cost: " << train->getPrice() << "\n";
-    
-    if (currentPlayer->getMoney() < train->getPrice()) {
-        messageStream << "You don't have enough money to buy this train...\n";
-    } else {
-        messageStream << "Do you want to buy this train? 1. Yes, 2. No\n";
-        
-        // Instead of std::cin, you should handle user input through SFML (buttons or keyboard events)
-        int ans;
-        std::cin >> ans;  // You may want to replace this with GUI input handling
-
-        if (ans == 1) {
-            if (Train::count >= 4) {
-                messageStream << "All 4 trains were already sold!\n";
-            } else if (currentPlayer->PurchaseTrain(train)) {
-                messageStream << "Train: " << train->name << " was purchased successfully\n";
-                
-                std::ostringstream playerInfo;
-                currentPlayer->displayLong(playerInfo);  // Collect player status info
-                messageStream << playerInfo.str();  // Append player info to the message
+    int ans;
+    std::cout<<"Current money: " <<currentPlayer->getMoney()<< std::endl;
+    std::cout<<"Cost: " <<train->getPrice()<< std::endl;
+    if(currentPlayer->getMoney() < train->getPrice())
+    {
+        std::cout << "You don't have enough money to buy this train..." <<std::endl;
+    }
+    else
+    {
+        std::cout << "Do you want to buy this train? 1.Yes , 2.No" <<std::endl;
+        std::cin >> ans; 
+        if(ans ==1)
+        {
+            if(Train::count >= 4)
+            {
+                std::cout<< "All 4 trains were already sold !" <<std::endl;
+                return;
+            }
+            if(currentPlayer->PurchaseTrain(train))
+            {
+                std::cout<<"Train: "<< train->name << " was purchased succesfully" <<std::endl;
+                currentPlayer->displayLong(std::cout);
             }
         }
+       
     }
-    
-    // Update the sf::Text object with the message
-    gameMessage.setString(messageStream.str());
     
  }
 
-  void MonopolManager::BuyWaterCompany(WaterCompany* waterCompany,sf::Text& gameMessage)
+
+  void MonopolManager::BuyWaterCompany(WaterCompany* waterCompany)
  {
-     std::ostringstream messageStream;  // String stream to collect all the output messages
-    
-    messageStream << "Current money: " << currentPlayer->getMoney() << "\n";
-    messageStream << "Cost: " << waterCompany->getPrice() << "\n";
-    
-    if (currentPlayer->getMoney() < waterCompany->getPrice()) {
-        messageStream << "You don't have enough money to buy the Water Company...\n";
-    } else {
-        messageStream << "Do you want to buy the Water Company? 1. Yes, 2. No\n";
-        
-        // Instead of std::cin, use SFML event handling for GUI input
-        int ans;
-        std::cin >> ans;  // Replace with GUI-based input in your actual game
-        
-        if (ans == 1) {
-            if (currentPlayer->PurchaseWaterCompany(waterCompany)) {
-                messageStream << waterCompany->name << " was purchased successfully\n";
-                
-                // Append player status information
-                std::ostringstream playerInfo;
-                currentPlayer->displayLong(playerInfo);
-                messageStream << playerInfo.str();
+    int ans;
+    std::cout<<"Current money: " <<currentPlayer->getMoney()<< std::endl;
+    std::cout<<"Cost: " <<waterCompany->getPrice()<< std::endl;
+    if(currentPlayer->getMoney() < waterCompany->getPrice())
+    {
+        std::cout << "You don't have enough money to buy the Water Company..." <<std::endl;
+    }
+
+    else
+    {
+        std::cout << "Do you want to buy the Water Company? 1.Yes , 2.No" <<std::endl;
+        std::cin >> ans; 
+        if(ans ==1)
+        {
+            if(currentPlayer->PurchaseWaterCompany(waterCompany))
+            {
+                std::cout<< waterCompany->name << " was purchased succesfully" <<std::endl;
+                currentPlayer->displayLong(std::cout);
             }
         }
+       
     }
-    
-    // Update the sf::Text object with the message
-    gameMessage.setString(messageStream.str());
 
  }
 
-  void MonopolManager::BuyElectricCompanyOwner(ElectricCompany* electricCompany,sf::Text& gameMessage)
+  void MonopolManager::BuyElectricCompanyOwner(ElectricCompany* electricCompany)
  {
-    std::ostringstream messageStream;  // Create a string stream to collect all output messages
-
-    messageStream << "Current money: " << currentPlayer->getMoney() << "\n";
-    messageStream << "Cost: " << electricCompany->getPrice() << "\n";
-
-    if (currentPlayer->getMoney() < electricCompany->getPrice()) {
-        messageStream << "You don't have enough money to buy the Electric Company...\n";
-    } else {
-        messageStream << "Do you want to buy the Electric Company? 1. Yes, 2. No\n";
-        
-        // Instead of std::cin, handle input through the GUI (replace this later with actual button handling)
-        int ans;
-        std::cin >> ans;  // Replace with button click logic in the actual game
-        
-        if (ans == 1) {
-            if (currentPlayer->PurchaseElectricCompany(electricCompany)) {
-                messageStream << electricCompany->name << " was purchased successfully\n";
-                
-                // Append player status information
-                std::ostringstream playerInfo;
-                currentPlayer->displayLong(playerInfo);
-                messageStream << playerInfo.str();
-            }
-        }
+    int ans;
+    std::cout<<"Current money: " <<currentPlayer->getMoney()<< std::endl;
+    std::cout<<"Cost: " <<electricCompany->getPrice()<< std::endl;
+    if(currentPlayer->getMoney() < electricCompany->getPrice())
+    {
+        std::cout << "You don't have enough money to buy the Water Company..." <<std::endl;
     }
-
-    // Update the sf::Text object with the accumulated message
-    gameMessage.setString(messageStream.str());
+    else
+    {
+        std::cout << "Do you want to buy the Electric Company? 1.Yes , 2.No" <<std::endl;
+        std::cin >> ans; 
+        if(ans ==1)
+        {
+            if(currentPlayer->PurchaseElectricCompany(electricCompany))
+            {
+                std::cout<< electricCompany->name << " was purchased succesfully" <<std::endl;
+                currentPlayer->displayLong(std::cout);
+            }
+        }       
+    }
     
  }
  
- void MonopolManager::CheckEdgeSquare(EdgeSquare* edgeSquare, sf::Text& gameMessage) {
-    std::ostringstream messageStream;  // Create a string stream to accumulate the output message
-
-    switch(edgeSquare->getType()) {
+  void MonopolManager::CheckEdgeSquare(EdgeSquare* edgeSquare)
+ {
+    switch(edgeSquare->getType())
+    {
         case EdgeSquareType::Start:
             GrantPlayerMoney(StartMoney);
-            messageStream << "You landed on the START square. You've been granted money!\n";
             break;
-
         case EdgeSquareType::FreeParking:
-            messageStream << "You are on FREE PARKING square, turn finished...\n";
+            std::cout << "You are on FREE PARKING square, turn finished ..." <<std::endl;
             break;
-
         case EdgeSquareType::GoToJail:
-            messageStream << "You are going to jail!!\n";
-            messageStream << "Know your rights.\n";
-            GoToJail();
-            break;
+           std::cout << "You are going to jail !!" <<std::endl;
+           std::cout << "Know your rights ." <<std::endl;
+                GoToJail();
+                 break;   
+         case EdgeSquareType::VisitNearJail:
+           std::cout << "You are visiting near the jail, nothing to do here ..." <<std::endl;
+                break;       
 
-        case EdgeSquareType::VisitNearJail:
-            messageStream << "You are visiting near the jail, nothing to do here...\n";
-            break;
     }
-
-    // Update the sf::Text object with the accumulated message
-    gameMessage.setString(messageStream.str());
-}
+    
+ }
 
 void MonopolManager::CheckEdgeSquareType(std::shared_ptr<Square>& square)
 {
@@ -420,69 +394,58 @@ void MonopolManager::CheckEdgeSquareType(std::shared_ptr<Square>& square)
 }
 
 
-void MonopolManager::UpgradeStreet(Street* street, sf::Text& gameMessage) {
-    std::ostringstream messageStream;  // Create a string stream to accumulate the output message
-
-    messageStream << "Current number of houses on this street: " << street->getNumOfHouses() << "\n";
-
-    if (street->getNumOfHouses() < 4) {
+void MonopolManager::UpgradeStreet(Street* street)
+{
+    std::cout << "Current number of houses on this street: " << street->getNumOfHouses() <<std::endl;
+    if(street->getNumOfHouses() <4)
+    {
         int ans1;
-        messageStream << "Would you like to upgrade and purchase another house on this street? 1.Yes, 2.No\n";
-        
-        // Here, instead of cin, we would use a different mechanism to get user input
-        // Assuming some function or mechanism to get user input in the GUI
-        // Example: ans1 = GetUserInput();  // This is a placeholder for actual input logic
-        
-        std::cin >> ans1;  // Placeholder for user input mechanism in the console
-        
-        if (ans1 == 1) {
+        std::cout << "would you like to upgrade and purchase another house on this street? 1.Yes , 2. No" << std::endl;
+        std::cin >> ans1;
+        if(ans1==1)
+        {
             currentPlayer->PurchaseHouse(street);
-            messageStream << "House purchased on the street!\n";
-        }
-    } else {
-        if (!street->getHasHotel()) {
-            int ans2;
-            messageStream << "Would you like to upgrade and purchase a hotel on this street? 1.Yes, 2.No\n";
-            
-            // Assuming some function or mechanism to get user input in the GUI
-            // Example: ans2 = GetUserInput();  // This is a placeholder for actual input logic
-            
-            std::cin >> ans2;  // Placeholder for user input mechanism in the console
-            
-            if (ans2 == 1) {
-                currentPlayer->PurchaseHotel(street);
-                messageStream << "Hotel purchased on the street!\n";
-            }
+
         }
     }
+    else
+    {
+        if(!street->getHasHotel())
+        {
+        int ans2;
+        std::cout << "would you like to upgrade and purchase an hotel on this street?" << std::endl;
+        std::cin >> ans2;
+        if(ans2 ==1)
+        {
+            currentPlayer->PurchaseHotel(street);
 
-    // Update the sf::Text object with the accumulated message
-    gameMessage.setString(messageStream.str());
+        }
+        }
+    
+    }
+
 }
 
- bool MonopolManager::ChargePlayer(std::shared_ptr<Player>& src, std::shared_ptr<Player>& dst, float amount, sf::Text& gameMessage) {
-    std::ostringstream messageStream;  // Create a string stream to accumulate the output message
+ bool MonopolManager::ChargePlayer(std::shared_ptr<Player>& src,std::shared_ptr<Player>& dst,float amount)
+ {
     bool isValidTransfer = true;
-
-    messageStream << "Transfer: " << amount << "₪ From " << src->getName() << " To " << dst->getName() << "\n";
-    messageStream << "Charging ...\n";
-
-    if (src->getMoney() < amount) {
+    std::cout << "Transfer: " <<  amount  <<"₪ From "<< src->getName() << " To "<< dst->getName() << std::endl;
+    std::cout << "Charging ..." << std::endl;
+    if(src->getMoney() < amount)
+    {
         src->setIsBankrupt(true);
-        TransferAllProperties(src, dst);
-        messageStream << src->getName() << " is bankrupt! All properties transferred."<<std::endl;
-        isValidTransfer = false;
-    } else {
+        TransferAllProperties(src,dst);
+        isValidTransfer =false;
+    }
+    else
+    {
         src->changeMoney(-amount);
         dst->changeMoney(amount);
-        messageStream << "Transfer completed successfully." <<std::endl;
     }
 
-    // Update the sf::Text object with the accumulated message
-    gameMessage.setString(messageStream.str());
-
     return isValidTransfer;
-}
+
+ }
 
  void MonopolManager::TransferAllProperties(std::shared_ptr<Player>& src,std::shared_ptr<Player>& dst)
  {

@@ -70,6 +70,8 @@ int currentPlayerIndex = 0;
 bool hasDoneTurn = false;
 bool hasPressedOnStatusButton = false;
 
+
+
 // Welcome text
 sf::Text WelcomeText;
 WelcomeText.setFont(font);
@@ -168,6 +170,32 @@ playerInputText.setCharacterSize(24);
 playerInputText.setFillColor(sf::Color::Black);
 playerInputText.setPosition(windowSize.x / 2 - 50, windowSize.y / 2);
 std::string input = "";
+
+//Yes and No buttons
+sf::RectangleShape yesButton(sf::Vector2f(100, 50));
+sf::RectangleShape noButton(sf::Vector2f(100, 50));
+
+sf::Text yesText, noText;
+yesText.setFont(font); // Assuming you have a font loaded
+yesText.setString("Yes");
+yesText.setCharacterSize(24);
+yesText.setFillColor(sf::Color::Black);
+
+noText.setFont(font);  // Same font for "No"
+noText.setString("No");
+noText.setCharacterSize(24);
+noText.setFillColor(sf::Color::Black);
+
+// Set button positions
+yesButton.setPosition(300, 400); // Adjust these values as needed
+noButton.setPosition(500, 400);
+
+yesText.setPosition(320, 410);  // Adjust positions to center the text inside the buttons
+noText.setPosition(520, 410);
+
+yesButton.setFillColor(sf::Color::Green);
+noButton.setFillColor(sf::Color::Red);
+
 
 
 
@@ -342,18 +370,23 @@ while (window.pollEvent(event))
     }
 
         // Handle text input for number of players
-    if (!isNumPlayersEntered && event.type == sf::Event::TextEntered) {
-        if (event.text.unicode >= '0' && event.text.unicode <= '9') {
+    if (!isNumPlayersEntered && event.type == sf::Event::TextEntered)
+    {
+        if (event.text.unicode >= '0' && event.text.unicode <= '9')
+        {
             input += static_cast<char>(event.text.unicode);
             playerInputText.setString(input);
         }
-        else if (event.text.unicode == '\b' && !input.empty()) { // Handle backspace
+        else if (event.text.unicode == '\b' && !input.empty())
+         { // Handle backspace
             input.pop_back();
             playerInputText.setString(input);
         }
-        else if (event.text.unicode == 13 && !input.empty()) { // Enter key pressed
+        else if (event.text.unicode == 13 && !input.empty())
+        { // Enter key pressed
             numPlayers = std::stoi(input);
-            if (numPlayers >= 2 && numPlayers <= 8) {
+            if (numPlayers >= 2 && numPlayers <= 8) 
+            {
                 isNumPlayersEntered = true;
 
             // Constants for the starting square position
@@ -367,7 +400,8 @@ while (window.pollEvent(event))
             const float scaleFactor = (numPlayers <= 4) ? 0.5f : 0.3f; 
 
             // Generate player icons
-            for (int i = 0; i < numPlayers; ++i) {
+            for (int i = 0; i < numPlayers; ++i)
+            {
                 
                 std::shared_ptr<Player> p = std::make_shared<Player>("Player " + std::to_string(i + 1));
                 players.push_back(p);
@@ -391,20 +425,33 @@ while (window.pollEvent(event))
               
             }
                 InstructionText.setString("Players have been placed on the start square.");
-            } else {
-                input = ""; // Reset invalid input
-                playerInputText.setString(input);
-                InstructionText.setString("Please enter a valid number (2-8):");
+            } 
+            else 
+            {
+                    input = ""; // Reset invalid input
+                    playerInputText.setString(input);
+                    InstructionText.setString("Please enter a valid number (2-8):");
             }
 
         }
     }
+
         // Detect clicks on the buttons
     if (event.type == sf::Event::MouseButtonPressed)
     {
         if (event.mouseButton.button == sf::Mouse::Left) 
         {
             sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+          
+                if (yesButton.getGlobalBounds().contains(mousePos.x,mousePos.y))  // Yes button clicked
+                {
+                       
+                }
+                else if (noButton.getGlobalBounds().contains(mousePos.x,mousePos.y))  // No button clicked
+                {
+                    
+                    
+                }
 
             // Check if Player Status button is clicked
             if (playerStatusButton.getGlobalBounds().contains(mousePos.x, mousePos.y)) 
@@ -420,9 +467,7 @@ while (window.pollEvent(event))
                 {
                      StatusText.setString("");
                      playerStatusText.setString("Status");
-                }
-               
-
+                }            
             }
 
             // Check if Roll the Dice button is clicked
@@ -440,32 +485,28 @@ while (window.pollEvent(event))
 
             if (currentPos.getX() >= 0 && currentPos.getX() < 11 && currentPos.getY() >= 0 && currentPos.getY() < 11)  
             {
-
-                if( p == nullptr)
-                {      
-                    Board::getInstance().offerPlayerOptions(board[currentPos.getX()][currentPos.getY()],GameMessageText);
-                }
+                 if( p == nullptr)
+               {      
+                    //     Board::getInstance().offerPlayerOptions(board[currentPos.getX()][currentPos.getY()],GameMessageText);
+                 }
                 
                 else if( *p != players[currentPlayerIndex])
-                {
+               {
                     std::shared_ptr<Square>& currentSquare =  board[currentPos.getX()][currentPos.getY()];
-                    if (currentSquare == nullptr) {
-                        InstructionText.setString("Error: Current square is not initialized.");
-                        return;
-                    }
+        
                     os << currentSquare->display(os);
                     os <<"This Sqaure is owned by " << (*p)->getName();
                     float calculatedPrice = MonopolManager::getInstance().getActuallBillOfSquare(currentSquare,p);  
                 
-                if(!MonopolManager::getInstance().ChargePlayer(players[currentPlayerIndex],*p,calculatedPrice,GameMessageText))
-                {
-                    os<< players[currentPlayerIndex]->getName() <<" went bankrupt ..." <<std::endl << "All it's properties were passed to " 
-                    << (*p)->getName() <<std::endl;
-                }
-                else
-                {
-                    os << "Transfer of " << currentSquare->getPrice() <<"₪ was done Successfully!"<<std::endl;
-                }
+                    if(!MonopolManager::getInstance().ChargePlayer(players[currentPlayerIndex],*p,calculatedPrice))
+                    {
+                        os<< players[currentPlayerIndex]->getName() <<" went bankrupt ..." <<std::endl << "All it's properties were passed to " 
+                        << (*p)->getName() <<std::endl;
+                    }
+                    else
+                    {
+                        os << "Transfer of " << currentSquare->getPrice() <<"₪ was done Successfully!"<<std::endl;
+                    }
                 }
                 else
                 {
@@ -479,30 +520,34 @@ while (window.pollEvent(event))
                     GameMessage2Text.setString(os.str());
                 }
 
+             }
+            }
+
+            else
+            {
+                InstructionText.setString("You already did your Turn. Press Space to move on to the next Player !");
             }
                 
             
-            }
-                else
-                {
-                    InstructionText.setString("You already did your Turn. Press Space to move on to the next Player !");
-                }
         }
+               
     }
 
-    if (event.type == sf::Event::KeyPressed)
-     {
-        // Check if the pressed key is the spacebar
-        if (event.key.code == sf::Keyboard::Space) {
-            currentPlayerIndex ++;
-            currentPlayerIndex = currentPlayerIndex % numPlayers;
-            StatusPlayerTurnText.setString("Player " +std::to_string(currentPlayerIndex+1) +"'s Turn");
-            StatusText.setString("Status ...");
-            InstructionText.setString("");
-            hasDoneTurn = false;
+
+        if (event.type == sf::Event::KeyPressed)
+        {
+            // Check if the pressed key is the spacebar
+            if (event.key.code == sf::Keyboard::Space) {
+                currentPlayerIndex ++;
+                currentPlayerIndex = currentPlayerIndex % numPlayers;
+                StatusPlayerTurnText.setString("Player " +std::to_string(currentPlayerIndex+1) +"'s Turn");
+                StatusText.setString("Status ...");
+                InstructionText.setString("");
+                hasDoneTurn = false;
+            }
+            
         }
-           
-     }
+    
 }
 
 window.clear();
@@ -548,10 +593,11 @@ window.draw(playerStatusText);
 window.draw(rollDiceButton);
 window.draw(rollDiceText);
 
-   // Draw the player icons after placement
-    for (auto& icon : playerIcons) {
-        window.draw(icon);
-    }
+// Draw the player icons after placement
+for (auto& icon : playerIcons)
+{
+    window.draw(icon);
+}
 
 }
 
