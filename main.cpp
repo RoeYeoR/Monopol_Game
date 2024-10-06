@@ -143,7 +143,7 @@ sf::Text StatusText;
 StatusText.setFont(font);
 StatusText.setCharacterSize(24);
 StatusText.setFillColor(sf::Color::Black);
-StatusText.setString("Status...");
+//StatusText.setString("Status...");
 
 
 sf::FloatRect textBoundsStatus = StatusText.getLocalBounds();
@@ -567,7 +567,7 @@ while (window.pollEvent(event))
             currentPlayerIndex = currentPlayerIndex % numPlayers;
             MonopolManager::getInstance().setCurrentPlayer(players[currentPlayerIndex]);
             StatusPlayerTurnText.setString("Player " +std::to_string(currentPlayerIndex+1) +"'s Turn");
-            StatusText.setString("Status ...");
+            //StatusText.setString("Status ...");
             InstructionText.setString("");
             GameMessageText.setString("");
             GameMessage2Text.setString("");

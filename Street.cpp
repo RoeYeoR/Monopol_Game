@@ -65,10 +65,11 @@ void Street::display(std::ostream& os) const
 std::string Street::display() const
 {
     std::ostringstream os;
-     os <<  "Street name: " << name <<  "\n"<< "price:" << price << "\n"<<  "color group:" << color <<std::endl;
+     os <<  "Street name: " << name <<  "\n"<< "ID: "<<  id << "\n" << "price:" << price << "\n"<<  "color group:" << color <<std::endl;
      return os.str();
 
 }
+
 
 bool Street::operator==(Street& other) const
 {
