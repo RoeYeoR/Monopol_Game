@@ -35,7 +35,7 @@ MonopolManager::MonopolManager()
 
     for(int i=0; i <chanceStrings.size(); i++)
     {
-        Chance c(chanceStrings[i]);
+        Chance c(i+1,chanceStrings[i]);
         gameChanceCards.push_back(c);
     }
                     
@@ -179,11 +179,13 @@ void MonopolManager::CheckTaxPrice(Tax* tax, sf::Text& gameMessage) {
  void MonopolManager::AddChance(sf::Text& gameMessage) {
     std::ostringstream messageStream;
     Chance* card = currentPlayer->getChance();
-    if (card != nullptr) {
+    if (card != nullptr && card->getWasInUse() ==false) {
         messageStream << "A chance card was taken successfully!\n";
         messageStream<< "Chance Card Description: " << card->display();
+        UseChanceCard(card->getID(),gameMessage);
+        card->setWasInUse(true);
     } else {
-        messageStream << "Couldn't add a chance card...\n";
+        messageStream << "Couldn't add a chance card...or was already in use or there were no more cards left\n";
     }
 
     // Update the game message to reflect the results
@@ -605,6 +607,136 @@ void MonopolManager::UpgradeStreet(Street* street, sf::Text& gameMessage)
     Point2D jailSquare(0,10);
     currentPlayer->GoToSquare(jailSquare);
  }
+
+
+  void MonopolManager::UseChanceCard(int id,sf::Text& gameMessage)
+  {
+    switch(id)
+    {
+        case 1:
+        {
+        Point2D p(10,10);
+        currentPlayer->GoToSquare(p); //Start square
+        GrantPlayerMoney(200);
+        break;
+        }
+        
+
+        case 2:
+        {
+        GrantPlayerMoney(50);
+        break;
+        }
+        
+
+        case 3:
+        {
+              currentPlayer->MoveOnBoard(-3);
+        break;
+        }
+      
+
+        case 4:
+        {
+        Point2D jailPoint(10,0);
+        currentPlayer->GoToSquare(jailPoint);
+        break;
+        }
+       
+
+
+        case 5:
+        {
+        currentPlayer->repairBuildings();
+        break;
+        }
+       
+
+        case 6:
+        {
+        currentPlayer->changeMoney(-15);
+        break;
+        }
+        
+
+        case 7:
+        {
+        Point2D railRoadPoint(10,5);
+        if(currentPlayer->getCurrentPosition().getY()<5 || (currentPlayer->getCurrentPosition().getX()<10))
+        {
+            currentPlayer->changeMoney(200);
+        }
+        currentPlayer->GoToSquare(railRoadPoint);
+        break;
+
+        }
+       
+
+        case 8:
+
+        break;
+
+        case 9:
+        {
+        for(std::shared_ptr<Player>& p : players)
+        {
+            if(p != currentPlayer)
+            {
+                 ChargePlayer(currentPlayer,p,50,gameMessage);   
+            }
+        }
+        break;
+
+        }
+       
+
+        case 10:
+        {
+        currentPlayer->changeMoney(150);
+        break;
+        }
+        
+
+        case 11:
+
+        break;
+
+        case 12:
+        {
+         Point2D illinoisPoint(0,4);
+         if(currentPlayer->getCurrentPosition().getX()<10 && currentPlayer->getCurrentPosition().getY()==10)
+         {
+            currentPlayer->changeMoney(200);
+         }
+       
+        currentPlayer->GoToSquare(illinoisPoint);
+        break;
+        }
+       
+
+        case 13:
+
+        break;
+
+        case 14:
+        break;
+
+        case 15:
+        break;
+
+        case 16:
+        break;
+
+
+        default:
+        gameMessage.setString("No valid card");
+        
+
+
+
+    }
+
+  }
 
  std::shared_ptr<Player>* MonopolManager::CheckIsWinner()
  {

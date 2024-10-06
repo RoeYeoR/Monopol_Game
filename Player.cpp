@@ -182,6 +182,23 @@ void Player::MoveOnBoard(int diceResult)
 
 }
 
+void Player::repairBuildings()
+{
+    for(Street& st : streets)
+    {
+        for (int i = 0; i < st.getNumOfHouses(); i++)
+        {
+            changeMoney(-25);
+        }
+        if(st.getHasHotel())
+        {
+            changeMoney(-100);
+        }
+        
+    }
+
+}
+
 
 void Player::GoToSquare(Point2D& p)
 {

@@ -42,6 +42,7 @@ class Player{
         void setHasOwnWaterCompany(bool var);
         void setHasOwnElectricCompany(bool var);
         void setIsInJail(bool var);
+        void repairBuildings();
         Point2D& getCurrentPosition();
         std::vector<Street>& getStreets();
         std::vector<Train>& getTrains();

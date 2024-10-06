@@ -68,8 +68,7 @@ Board::Board() :board(rows, std::vector<std::shared_ptr<Square>>(cols))
             }
             
     }
-    
-    
+
 }
 
 void Board::setSquare(int x, int y, std::shared_ptr<Square> square)
@@ -89,7 +88,6 @@ std::vector<Street>& Board::getTotalStreets()
 {
     return totalStreets;
 }
-
 
  std::shared_ptr<Player>* Board::checkSquareOwnerShip(const std::shared_ptr<Square>& square) {
     
@@ -115,7 +113,6 @@ std::vector<Street>& Board::getTotalStreets()
     return p;
     
 }
-
 
 void Board::offerPlayerOptions(const std::shared_ptr<Square>& square,sf::Text& gameMessage)
 {

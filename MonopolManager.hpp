@@ -84,6 +84,7 @@ class MonopolManager{
         void TransferAllProperties(std::shared_ptr<Player>& src,std::shared_ptr<Player>& dst);
         bool DeleteAllProperties();
         void GoToJail();
+        void UseChanceCard(int id,sf::Text& gameMessage);
         void GrantPlayerMoney(float sum);
         int getTotalSameColorStreets(Color color);
         bool areAllRestPlayersHaveBankRupt(std::shared_ptr<Player>& p);

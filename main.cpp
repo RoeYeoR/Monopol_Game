@@ -35,7 +35,7 @@ return -1; // Handle error
 sf::Music music;
 
 // Load music from a file (WAV, OGG, or FLAC)
-if (!music.openFromFile("Audio\\GameMusic.ogg"))
+if (!music.openFromFile("Audio\\GameMusic2.ogg"))
 {
     std::cerr << "Error loading music file\n";
     return -1;
@@ -73,7 +73,7 @@ int numPlayers = 0;
 int maxNumOfPlayers = 8;
 // Placeholder for player icons
 std::vector<sf::Sprite> playerIcons;
-std::vector<sf::Texture> playerTextures(maxNumOfPlayers);
+std::vector<sf::Texture> playerTextures;
 
 std::vector<std::shared_ptr<Player>> players;
 int currentPlayerIndex = 0;
@@ -85,8 +85,9 @@ bool hasPressedOnStatusButton = false;
 // Welcome text
 sf::Text WelcomeText;
 WelcomeText.setFont(font);
-WelcomeText.setCharacterSize(30);
-WelcomeText.setFillColor(sf::Color::Black);
+WelcomeText.setCharacterSize(50);
+WelcomeText.setFillColor(sf::Color::Yellow);
+WelcomeText.setOutlineThickness(1);
 WelcomeText.setString("Welcome To Monopl Game");
 
 
@@ -163,8 +164,9 @@ StatusText.setPosition(windowSize.x / 2, windowSize.y / 2 - 200); // Position it
 // Status text
 sf::Text StatusPlayerTurnText;
 StatusPlayerTurnText.setFont(font);
-StatusPlayerTurnText.setCharacterSize(24);
+StatusPlayerTurnText.setCharacterSize(35);
 StatusPlayerTurnText.setFillColor(sf::Color::Black);
+StatusPlayerTurnText.setOutlineThickness(0.5f);
 StatusPlayerTurnText.setString("Player 1's Turn");
 
 
@@ -217,7 +219,7 @@ for (int i = 0; i < maxNumOfPlayers; i++)
         std::cerr << "Error loading player texture " << "\n";
         return -1; // Handle error
     }
-    playerTextures[i] = std::move(playerTexture);
+    playerTextures.push_back(playerTexture);
 }
 
 // Create two buttons: Player Status and Roll the Dice
@@ -348,6 +350,7 @@ for (int col = 0; col < boardSize; ++col) {
     sf::Text text;
     text.setFont(font);
     text.setCharacterSize(15); // Adjust size as needed
+    text.setOutlineThickness(0.2f);
     text.setFillColor(sf::Color::Black); // Text color
 
     // Example text, you can set it to a property of your Square or any other identifier
@@ -580,6 +583,7 @@ while (window.pollEvent(event))
             InstructionText.setString("");
             GameMessageText.setString("");
             GameMessage2Text.setString("");
+            StatusText.setString("");
             hasDoneTurn = false;
         }
         
@@ -836,7 +840,7 @@ window.draw(rollDiceButton);
 window.draw(rollDiceText);
 
 // Draw the player icons after placement
-for (auto& icon : playerIcons)
+for (sf::Sprite& icon : playerIcons)
 {
     window.draw(icon);
 }
