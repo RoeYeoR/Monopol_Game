@@ -9,6 +9,7 @@
 #include "Board.hpp"
 #include "Player.hpp"  
 #include "EdgeSquare.hpp" 
+#include "InputManager.hpp"
 
 
 int main()
@@ -95,10 +96,10 @@ InstructionText.setString("Enter number of players (2-8):");
 
 sf::FloatRect textBoundsInstruction = InstructionText.getLocalBounds();
 InstructionText.setOrigin(textBoundsInstruction.width / 2, textBoundsInstruction.height / 2); // Center the origin
-InstructionText.setPosition(windowSize.x / 2, windowSize.y / 2 - 100); // Position it in the center of the window
+InstructionText.setPosition(windowSize.x / 2, windowSize.y / 2); // Position it in the center of the window
 
 
-// Instruction text
+// Instruction Space text
 sf::Text InstructionSpaceText;
 InstructionSpaceText.setFont(font);
 InstructionSpaceText.setCharacterSize(24);
@@ -108,7 +109,7 @@ InstructionSpaceText.setString("PRESS SPACE TO CHANGE TURN TO NEXT PLAYER");
 
 sf::FloatRect textBoundsInstructionSpace = InstructionSpaceText.getLocalBounds();
 InstructionSpaceText.setOrigin(textBoundsInstructionSpace.width / 2, textBoundsInstructionSpace.height / 2); // Center the origin
-InstructionSpaceText.setPosition(windowSize.x / 2, windowSize.y / 2 + 300); 
+InstructionSpaceText.setPosition(windowSize.x / 2, windowSize.y / 2 + 350); 
 
 
 // GameMessage text
@@ -121,7 +122,7 @@ GameMessageText.setString("Game Message ...");
 
 sf::FloatRect textBoundsGameMessageText = GameMessageText.getLocalBounds();
 GameMessageText.setOrigin(textBoundsGameMessageText.width / 2, textBoundsGameMessageText.height / 2); // Center the origin
-GameMessageText.setPosition(windowSize.x / 2, windowSize.y / 2 + 150); 
+GameMessageText.setPosition(windowSize.x / 2, windowSize.y / 2 + 200); 
 
 // GameMessage2 text
 sf::Text GameMessage2Text;
@@ -133,7 +134,7 @@ GameMessage2Text.setString("Game Message 2 ...");
 
 sf::FloatRect textBoundsGameMessage2Text = GameMessage2Text.getLocalBounds();
 GameMessage2Text.setOrigin(textBoundsGameMessage2Text.width / 2, textBoundsGameMessage2Text.height / 2); // Center the origin
-GameMessage2Text.setPosition(windowSize.x / 2, windowSize.y / 2 + 180); 
+GameMessage2Text.setPosition(windowSize.x / 2, windowSize.y / 2 + 250); 
 
 
 
@@ -160,7 +161,7 @@ StatusPlayerTurnText.setString("Player 1's Turn");
 
 sf::FloatRect textBoundsStatusPlayerTurn = StatusPlayerTurnText.getLocalBounds();
 StatusPlayerTurnText.setOrigin(textBoundsStatusPlayerTurn.width / 2, textBoundsStatusPlayerTurn.height / 2); // Center the origin
-StatusPlayerTurnText.setPosition(windowSize.x / 2, windowSize.y / 2 - 250); // Position it in the center of the window
+StatusPlayerTurnText.setPosition(windowSize.x / 2, windowSize.y / 2 - 300); // Position it in the center of the window
 
 
 // Text for user input
@@ -424,6 +425,7 @@ while (window.pollEvent(event))
                 playerIcons.push_back(playerSprite);
               
             }
+                MonopolManager::getInstance().setCurrentPlayer(players[currentPlayerIndex]);
                 InstructionText.setString("Players have been placed on the start square.");
             } 
             else 
@@ -487,8 +489,8 @@ while (window.pollEvent(event))
             {
                  if( p == nullptr)
                {      
-                    //     Board::getInstance().offerPlayerOptions(board[currentPos.getX()][currentPos.getY()],GameMessageText);
-                 }
+                         Board::getInstance().offerPlayerOptions(board[currentPos.getX()][currentPos.getY()],GameMessageText);
+                }
                 
                 else if( *p != players[currentPlayerIndex])
                {
@@ -498,7 +500,7 @@ while (window.pollEvent(event))
                     os <<"This Sqaure is owned by " << (*p)->getName();
                     float calculatedPrice = MonopolManager::getInstance().getActuallBillOfSquare(currentSquare,p);  
                 
-                    if(!MonopolManager::getInstance().ChargePlayer(players[currentPlayerIndex],*p,calculatedPrice))
+                    if(!MonopolManager::getInstance().ChargePlayer(players[currentPlayerIndex],*p,calculatedPrice,GameMessageText))
                     {
                         os<< players[currentPlayerIndex]->getName() <<" went bankrupt ..." <<std::endl << "All it's properties were passed to " 
                         << (*p)->getName() <<std::endl;
@@ -533,21 +535,137 @@ while (window.pollEvent(event))
     }
 
 
-        if (event.type == sf::Event::KeyPressed)
-        {
-            // Check if the pressed key is the spacebar
-            if (event.key.code == sf::Keyboard::Space) {
-                currentPlayerIndex ++;
-                currentPlayerIndex = currentPlayerIndex % numPlayers;
-                StatusPlayerTurnText.setString("Player " +std::to_string(currentPlayerIndex+1) +"'s Turn");
-                StatusText.setString("Status ...");
-                InstructionText.setString("");
-                hasDoneTurn = false;
-            }
-            
+    if (event.type == sf::Event::KeyPressed)
+    {
+        // Check if the pressed key is the spacebar
+        if (event.key.code == sf::Keyboard::Space) {
+            currentPlayerIndex ++;
+            currentPlayerIndex = currentPlayerIndex % numPlayers;
+            MonopolManager::getInstance().setCurrentPlayer(players[currentPlayerIndex]);
+            StatusPlayerTurnText.setString("Player " +std::to_string(currentPlayerIndex+1) +"'s Turn");
+            StatusText.setString("Status ...");
+            InstructionText.setString("");
+            GameMessageText.setString("");
+            GameMessage2Text.setString("");
+            hasDoneTurn = false;
         }
-    
+        
+    }
+
+
+
+    // Handle input only when waiting for user input
+        if (InputManager::getInstance().isWaitingForInput()) {
+            if (event.type == sf::Event::KeyPressed) {
+                if (event.key.code == sf::Keyboard::Num1) {
+                    InputManager::getInstance().setPlayerChoice(1);  // Player chose "Yes"
+                    InputManager::getInstance().setWaitingForInput(false);
+                } else if (event.key.code == sf::Keyboard::Num2) {
+                    InputManager::getInstance().setPlayerChoice(2);  // Player chose "No"
+                    InputManager::getInstance().setWaitingForInput(false);
+                }
+            }
+        }
+
 }
+
+switch (InputManager::getInstance().getCurrentState()) {
+    case InputState::None:
+        // Logic for None state
+        break;
+
+    case InputState::BuyStreet:
+        // Logic for BuyStreet state
+        if (InputManager::getInstance().getPlayerChoice() == 1)
+        {
+            
+            GameMessageText.setString("You chose to buy this street !:)");
+            Point2D& currentPos= players[currentPlayerIndex]->getCurrentPosition();
+            auto street = dynamic_cast<Street*>(board[currentPos.getX()][currentPos.getY()].get());
+             if (players[currentPlayerIndex]->PurchaseStreet(street)) {
+                 std::ostringstream messageStream;                
+                messageStream << "Street: " << street->name << " was purchased successfully!\n";
+                GameMessage2Text.setString(messageStream.str());
+                
+            }
+
+              InputManager::getInstance().reset();
+
+        }
+
+        if (InputManager::getInstance().getPlayerChoice() == 2)
+        {
+            GameMessageText.setString("");
+            GameMessage2Text.setString("You chose not to buy this Street... go on to the next player !");
+            InputManager::getInstance().reset();
+
+
+        }
+        break;
+
+    case InputState::PayTax:
+        // Logic for PayTax state
+        break;
+
+    case InputState::BuyTrain:
+        // Logic for BuyTrain state
+         if (InputManager::getInstance().getPlayerChoice() == 1)
+        {
+            
+            GameMessageText.setString("You chose to buy this train !:)");
+            Point2D& currentPos= players[currentPlayerIndex]->getCurrentPosition();
+            auto train = dynamic_cast<Train*>(board[currentPos.getX()][currentPos.getY()].get());
+            if (players[currentPlayerIndex]->PurchaseTrain(train)) {
+                 std::ostringstream messageStream;                
+                messageStream << "Train: " << train->name << " was purchased successfully!\n";
+                GameMessage2Text.setString(messageStream.str());
+                
+            }
+
+              InputManager::getInstance().reset();
+
+        }
+
+        if (InputManager::getInstance().getPlayerChoice() == 2)
+        {
+            GameMessageText.setString("");
+            GameMessage2Text.setString("You chose not to buy this Train... go on to the next player !");
+            InputManager::getInstance().reset();
+
+
+        }
+        break;
+
+    case InputState::BuyWaterCompany:
+        // Logic for BuyWaterCompany state
+        break;
+
+    case InputState::BuyElectricCompany:
+        // Logic for BuyElectricCompany state
+        break;
+
+    case InputState::HandleChance:
+        // Logic for HandleChance state
+        break;
+
+    case InputState::HandleCommunityChest:
+        // Logic for HandleCommunityChest state
+        break;
+
+    case InputState::EdgeSquare:
+        // Logic for EdgeSquare state
+        break;
+
+    // Add more cases for other InputStates as needed
+
+    default:
+        // Handle any unexpected states
+        break;
+}
+
+
+
+
 
 window.clear();
 

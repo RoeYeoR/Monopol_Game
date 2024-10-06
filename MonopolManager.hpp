@@ -12,7 +12,7 @@
 #include <ctime> 
 #include <cstdlib>  // For rand() and srand()
 #include "Player.hpp"
-
+#include "InputManager.hpp"
 #include <memory>
 #include <SFML/Graphics.hpp>
 
@@ -40,7 +40,7 @@ class MonopolManager{
         std::vector<std::shared_ptr<Player>> players;
         std::vector<Chance> gameChanceCards;
         std::vector<std::string> chanceStrings;
-        std::shared_ptr<Player> currentPlayer; 
+        std::shared_ptr<Player> currentPlayer;
        
        
         MonopolManager();
@@ -67,18 +67,18 @@ class MonopolManager{
         std::shared_ptr<Player>* CheckTrainOwner(const std::shared_ptr<Square>& square);
         std::shared_ptr<Player>* CheckWaterCompanyOwner(const std::shared_ptr<Square>& square);
         std::shared_ptr<Player>* CheckElectricCompanyOwner(const std::shared_ptr<Square>& square);
-        void CheckTaxPrice(Tax* tax);
-        void AddChance();
+        void CheckTaxPrice(Tax* tax, sf::Text& gameMessage);
+        void AddChance(sf::Text& gameMessage);
         void AddCommunityChest();
         float getActuallBillOfSquare(std::shared_ptr<Square>& square,std::shared_ptr<Player>* ownPlayer);
-        void BuyStreet(Street* street);
-        void BuyTrain(Train* train);
-        void BuyWaterCompany(WaterCompany* waterCompany);
-        void BuyElectricCompanyOwner(ElectricCompany* electricCompany);
-        void UpgradeStreet(Street* street);
-        void CheckEdgeSquare(EdgeSquare* edgeSquare);
+        void BuyStreet(Street* street, sf::Text& gameMessage);
+        void BuyTrain(Train* train, sf::Text& gameMessage);
+        void BuyWaterCompany(WaterCompany* waterCompany, sf::Text& gameMessage);
+        void BuyElectricCompany(ElectricCompany* electricCompany, sf::Text& gameMessage);
+        void UpgradeStreet(Street* street, sf::Text& gameMessage);
+        void CheckEdgeSquare(EdgeSquare* edgeSquare, sf::Text& gameMessage);
         void CheckEdgeSquareType(std::shared_ptr<Square>& square);
-        bool ChargePlayer(std::shared_ptr<Player>& src,std::shared_ptr<Player>& dst, float amount);
+        bool ChargePlayer(std::shared_ptr<Player>& src,std::shared_ptr<Player>& dst, float amount, sf::Text& gameMessage);
         void TransferAllProperties(std::shared_ptr<Player>& src,std::shared_ptr<Player>& dst);
         bool DeleteAllProperties();
         void GoToJail();

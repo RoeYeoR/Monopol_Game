@@ -148,33 +148,42 @@ std::shared_ptr<Player>* MonopolManager::CheckStreetOwner(const std::shared_ptr<
 
 }
 
-void MonopolManager::CheckTaxPrice(Tax* tax)
-{
-    std::cout << "You need to pay  " << tax->getPrice() << " to the bank" << std::endl;
-    std::cout << "current money:  " << currentPlayer->getMoney()<< std::endl;
-    if(currentPlayer->getMoney() < tax->getPrice())
-    {
-        std::cout<<"You don't have enouge money to pay for the bank. deleting your properties ..."<<std::endl;
-        if(DeleteAllProperties())
-        {
-            std::cout<< currentPlayer->getName() << " went bankrupt and finished the Game !...! " <<std::endl;
+void MonopolManager::CheckTaxPrice(Tax* tax, sf::Text& gameMessage) {
+    std::ostringstream messageStream;
+
+    // Display the tax amount to be paid
+    messageStream << "You need to pay " << tax->getPrice() << " to the bank\n";
+    messageStream << "Current money: " << currentPlayer->getMoney() << "\n";
+
+    if (currentPlayer->getMoney() < tax->getPrice()) {
+        messageStream << "You don't have enough money to pay the bank. Deleting your properties...\n";
+        if (DeleteAllProperties()) {
+            messageStream << currentPlayer->getName() << " went bankrupt and finished the game!\n";
         }
+    } else {
+        // Deduct the tax amount from the player's money
+        currentPlayer->setMoney(currentPlayer->getMoney() - tax->getPrice());
+        messageStream << "Charging your money...\n";
+        messageStream << "Money remaining after charge: " << currentPlayer->getMoney() << "\n";
     }
-    currentPlayer->setMoney(currentPlayer->getMoney() - tax->getPrice());
-    std::cout << "Charging your money...  " << std::endl <<" money remained after charge: "<< currentPlayer->getMoney()<< std::endl;
+
+    // Update the game message to reflect the results
+    gameMessage.setString(messageStream.str());
 }
 
- void MonopolManager::AddChance()
- {
-    if(currentPlayer->AddChance())
-    {
-        std::cout<<"A chance card was added succesfully!" << std::endl;
-    }
-    else{
-         std::cout<<"couldn't add a chance card..." << std::endl;
+ void MonopolManager::AddChance(sf::Text& gameMessage) {
+    std::ostringstream messageStream;
+
+    if (currentPlayer->AddChance()) {
+        messageStream << "A chance card was added successfully!\n";
+    } else {
+        messageStream << "Couldn't add a chance card...\n";
     }
 
- }
+    // Update the game message to reflect the results
+    gameMessage.setString(messageStream.str());
+}
+
 
  void MonopolManager::AddCommunityChest()
  {
@@ -231,137 +240,182 @@ void MonopolManager::CheckTaxPrice(Tax* tax)
 
  }
 
- void MonopolManager::BuyStreet(Street* street)
- {
-    int ans;
-    std::cout<<"Current money: " <<currentPlayer->getMoney()<< std::endl;
-    
-    if(currentPlayer->getMoney() < street->getPrice())
-    {
-        std::cout << "You don't have enough money to buy this street..." <<std::endl;
+ void MonopolManager::BuyStreet(Street* street, sf::Text& gameMessage) {
+    std::ostringstream messageStream;
+
+    // Display the current money
+    messageStream << "Current money: " << currentPlayer->getMoney() << "\n";
+
+    if (currentPlayer->getMoney() < street->getPrice()) {
+        messageStream << "You don't have enough money to buy this street...\n";
+        InputManager::getInstance().setWaitingForInput(false);  // No input needed
+    } else {
+        messageStream << "Do you want to buy this street? 1.Yes, 2.No\n";
+        InputManager::getInstance().setWaitingForInput(true);  // Waiting for user input
+        InputManager::getInstance().setCurrentState(InputState::BuyStreet);  // Set state to BuyStreet
     }
 
-    else
-    {
-    std::cout << "Do you want to buy this street? 1.Yes , 2.No" <<std::endl;
-    std::cin >> ans; 
-    if(ans ==1)
-    {
-        if(currentPlayer->PurchaseStreet(street))
-        {
-            std::cout<<"Street: "<< street->name << " was purchased succesfully" <<std::endl;
-            currentPlayer->displayLong(std::cout);
-        }
-    }      
-    }
- }
+    gameMessage.setString(messageStream.str());
 
-  void MonopolManager::BuyTrain(Train* train)
- {
-    int ans;
-    std::cout<<"Current money: " <<currentPlayer->getMoney()<< std::endl;
-    std::cout<<"Cost: " <<train->getPrice()<< std::endl;
-    if(currentPlayer->getMoney() < train->getPrice())
-    {
-        std::cout << "You don't have enough money to buy this train..." <<std::endl;
-    }
-    else
-    {
-        std::cout << "Do you want to buy this train? 1.Yes , 2.No" <<std::endl;
-        std::cin >> ans; 
-        if(ans ==1)
-        {
-            if(Train::count >= 4)
-            {
-                std::cout<< "All 4 trains were already sold !" <<std::endl;
-                return;
-            }
-            if(currentPlayer->PurchaseTrain(train))
-            {
-                std::cout<<"Train: "<< train->name << " was purchased succesfully" <<std::endl;
-                currentPlayer->displayLong(std::cout);
+    // If input is ready and player made a choice
+    if (!InputManager::getInstance().isWaitingForInput() && InputManager::getInstance().getPlayerChoice() != -1) {
+        if (InputManager::getInstance().getPlayerChoice() == 1) {
+            if (currentPlayer->PurchaseStreet(street)) {
+                messageStream.str("");  // Clear stream
+                messageStream << "Street: " << street->name << " was purchased successfully!\n";
+                //currentPlayer->displayLong(messageStream);
             }
         }
-       
-    }
-    
- }
-
-
-  void MonopolManager::BuyWaterCompany(WaterCompany* waterCompany)
- {
-    int ans;
-    std::cout<<"Current money: " <<currentPlayer->getMoney()<< std::endl;
-    std::cout<<"Cost: " <<waterCompany->getPrice()<< std::endl;
-    if(currentPlayer->getMoney() < waterCompany->getPrice())
-    {
-        std::cout << "You don't have enough money to buy the Water Company..." <<std::endl;
+        InputManager::getInstance().reset();  // Reset the input manager state after handling input
     }
 
-    else
-    {
-        std::cout << "Do you want to buy the Water Company? 1.Yes , 2.No" <<std::endl;
-        std::cin >> ans; 
-        if(ans ==1)
-        {
-            if(currentPlayer->PurchaseWaterCompany(waterCompany))
-            {
-                std::cout<< waterCompany->name << " was purchased succesfully" <<std::endl;
-                currentPlayer->displayLong(std::cout);
+    gameMessage.setString(messageStream.str());
+}
+
+ void MonopolManager::BuyTrain(Train* train, sf::Text& gameMessage) {
+    std::ostringstream messageStream;
+
+    // Display the current money and cost of the train
+    messageStream << "Current money: " << currentPlayer->getMoney() << "\n";
+    messageStream << "Cost: " << train->getPrice() << "\n";
+
+    // Check if the player can afford the train
+    if (currentPlayer->getMoney() < train->getPrice()) {
+        messageStream << "You don't have enough money to buy this train...\n";
+        InputManager::getInstance().setWaitingForInput(false);  // No input needed
+    } else {
+        // Ask if the player wants to buy the train
+        messageStream << "Do you want to buy this train? 1.Yes, 2.No\n";
+        InputManager::getInstance().setWaitingForInput(true);  // Waiting for user input
+        InputManager::getInstance().setCurrentState(InputState::BuyTrain);  // Set state to BuyTrain
+    }
+
+    gameMessage.setString(messageStream.str());
+
+    // Process player input if they have made a choice
+    if (!InputManager::getInstance().isWaitingForInput() && InputManager::getInstance().getPlayerChoice() != -1) {
+        if (InputManager::getInstance().getPlayerChoice() == 1) {
+            if (Train::count >= 4) {
+                messageStream.str("");  // Clear the stream
+                messageStream << "All 4 trains were already sold!\n";
+            } else if (currentPlayer->PurchaseTrain(train)) {
+                messageStream.str("");  // Clear the stream
+                messageStream << "Train: " << train->name << " was purchased successfully!\n";
+               // currentPlayer->displayLong(messageStream);
             }
         }
-       
+        // Reset the InputManager after processing the input
+        InputManager::getInstance().reset();
     }
 
- }
+    gameMessage.setString(messageStream.str());
+}
 
-  void MonopolManager::BuyElectricCompanyOwner(ElectricCompany* electricCompany)
- {
-    int ans;
-    std::cout<<"Current money: " <<currentPlayer->getMoney()<< std::endl;
-    std::cout<<"Cost: " <<electricCompany->getPrice()<< std::endl;
-    if(currentPlayer->getMoney() < electricCompany->getPrice())
-    {
-        std::cout << "You don't have enough money to buy the Water Company..." <<std::endl;
+ void MonopolManager::BuyWaterCompany(WaterCompany* waterCompany, sf::Text& gameMessage) {
+    std::ostringstream messageStream;
+
+    // Display the current money and cost of the Water Company
+    messageStream << "Current money: " << currentPlayer->getMoney() << "\n";
+    messageStream << "Cost: " << waterCompany->getPrice() << "\n";
+
+    // Check if the player can afford the Water Company
+    if (currentPlayer->getMoney() < waterCompany->getPrice()) {
+        messageStream << "You don't have enough money to buy the Water Company...\n";
+        InputManager::getInstance().setWaitingForInput(false);  // No input needed
+    } else {
+        // Ask if the player wants to buy the Water Company
+        messageStream << "Do you want to buy the Water Company? 1.Yes, 2.No\n";
+        InputManager::getInstance().setWaitingForInput(true);  // Waiting for user input
+        InputManager::getInstance().setCurrentState(InputState::BuyWaterCompany);  // Set state to BuyWaterCompany
     }
-    else
-    {
-        std::cout << "Do you want to buy the Electric Company? 1.Yes , 2.No" <<std::endl;
-        std::cin >> ans; 
-        if(ans ==1)
-        {
-            if(currentPlayer->PurchaseElectricCompany(electricCompany))
-            {
-                std::cout<< electricCompany->name << " was purchased succesfully" <<std::endl;
-                currentPlayer->displayLong(std::cout);
+
+    gameMessage.setString(messageStream.str());
+
+    // Process player input if they have made a choice
+    if (!InputManager::getInstance().isWaitingForInput() && InputManager::getInstance().getPlayerChoice() != -1) {
+        if (InputManager::getInstance().getPlayerChoice() == 1) {
+            if (currentPlayer->PurchaseWaterCompany(waterCompany)) {
+                messageStream.str("");  // Clear the stream
+                messageStream << waterCompany->name << " was purchased successfully!\n";
+                //currentPlayer->displayLong(messageStream);
             }
-        }       
+        }
+        // Reset the InputManager after processing the input
+        InputManager::getInstance().reset();
     }
-    
- }
- 
-  void MonopolManager::CheckEdgeSquare(EdgeSquare* edgeSquare)
- {
-    switch(edgeSquare->getType())
-    {
+
+    gameMessage.setString(messageStream.str());
+}
+
+
+ void MonopolManager::BuyElectricCompany(ElectricCompany* electricCompany, sf::Text& gameMessage) {
+    std::ostringstream messageStream;
+
+    // Display the current money and cost of the Electric Company
+    messageStream << "Current money: " << currentPlayer->getMoney() << "\n";
+    messageStream << "Cost: " << electricCompany->getPrice() << "\n";
+
+    // Check if the player can afford the Electric Company
+    if (currentPlayer->getMoney() < electricCompany->getPrice()) {
+        messageStream << "You don't have enough money to buy the Electric Company...\n";
+        InputManager::getInstance().setWaitingForInput(false);  // No input needed
+    } else {
+        // Ask if the player wants to buy the Electric Company
+        messageStream << "Do you want to buy the Electric Company? 1.Yes, 2.No\n";
+        InputManager::getInstance().setWaitingForInput(true);  // Waiting for user input
+        InputManager::getInstance().setCurrentState(InputState::BuyElectricCompany);  // Set state to BuyElectricCompany
+    }
+
+    gameMessage.setString(messageStream.str());
+
+    // Process player input if they have made a choice
+    if (!InputManager::getInstance().isWaitingForInput() && InputManager::getInstance().getPlayerChoice() != -1) {
+        if (InputManager::getInstance().getPlayerChoice() == 1) {
+            if (currentPlayer->PurchaseElectricCompany(electricCompany)) {
+                messageStream.str("");  // Clear the stream
+                messageStream << electricCompany->name << " was purchased successfully!\n";
+                //currentPlayer->displayLong(messageStream);
+            }
+        }
+        // Reset the InputManager after processing the input
+        InputManager::getInstance().reset();
+    }
+
+    gameMessage.setString(messageStream.str());
+}
+
+void MonopolManager::CheckEdgeSquare(EdgeSquare* edgeSquare, sf::Text& gameMessage) {
+    std::ostringstream messageStream;
+
+    switch (edgeSquare->getType()) {
         case EdgeSquareType::Start:
             GrantPlayerMoney(StartMoney);
+            messageStream << "You received " << StartMoney << " money for landing on the Start square!\n";
             break;
-        case EdgeSquareType::FreeParking:
-            std::cout << "You are on FREE PARKING square, turn finished ..." <<std::endl;
-            break;
-        case EdgeSquareType::GoToJail:
-           std::cout << "You are going to jail !!" <<std::endl;
-           std::cout << "Know your rights ." <<std::endl;
-                GoToJail();
-                 break;   
-         case EdgeSquareType::VisitNearJail:
-           std::cout << "You are visiting near the jail, nothing to do here ..." <<std::endl;
-                break;       
 
+        case EdgeSquareType::FreeParking:
+            messageStream << "You are on FREE PARKING square, turn finished...\n";
+            break;
+
+        case EdgeSquareType::GoToJail:
+            messageStream << "You are going to jail!!\n";
+            messageStream << "Know your rights...\n";
+            GoToJail();
+            break;
+
+        case EdgeSquareType::VisitNearJail:
+            messageStream << "You are visiting near the jail, nothing to do here...\n";
+            break;
+
+        default:
+            messageStream << "You landed on an unknown Edge Square type.\n";
+            break;
     }
-    
- }
+
+    // Update the game message
+    gameMessage.setString(messageStream.str());
+}
+
 
 void MonopolManager::CheckEdgeSquareType(std::shared_ptr<Square>& square)
 {
@@ -384,68 +438,81 @@ void MonopolManager::CheckEdgeSquareType(std::shared_ptr<Square>& square)
     }
 
 
-
-
-
-
-
    }
    
 }
 
 
-void MonopolManager::UpgradeStreet(Street* street)
+void MonopolManager::UpgradeStreet(Street* street, sf::Text& gameMessage)
 {
-    std::cout << "Current number of houses on this street: " << street->getNumOfHouses() <<std::endl;
-    if(street->getNumOfHouses() <4)
-    {
-        int ans1;
-        std::cout << "would you like to upgrade and purchase another house on this street? 1.Yes , 2. No" << std::endl;
-        std::cin >> ans1;
-        if(ans1==1)
-        {
-            currentPlayer->PurchaseHouse(street);
+    std::ostringstream messageStream;
+    messageStream << "Current number of houses on this street: " << street->getNumOfHouses() << "\n";
+    InputManager& inputManager = InputManager::getInstance();
 
+    if (street->getNumOfHouses() < 4) {
+        messageStream << "Would you like to upgrade and purchase another house on this street? 1. Yes, 2. No\n";
+        gameMessage.setString(messageStream.str());
+
+        inputManager.setCurrentState(InputState::None); // Reset the state after setting message
+        inputManager.setWaitingForInput(true);
+
+        // Check for player input
+        if (inputManager.isWaitingForInput()) {
+            int choice = inputManager.getPlayerChoice();
+            if (choice == 1) {
+                currentPlayer->PurchaseHouse(street);
+                inputManager.setWaitingForInput(false);
+            } else if (choice == 2) {
+                inputManager.setWaitingForInput(false);
+            }
+        }
+    } else {
+        if (!street->getHasHotel()) {
+            messageStream << "Would you like to upgrade and purchase a hotel on this street? 1. Yes, 2. No\n";
+            gameMessage.setString(messageStream.str());
+
+            inputManager.setCurrentState(InputState::None); // Reset the state after setting message
+            inputManager.setWaitingForInput(true);
+
+            // Check for player input
+            if (inputManager.isWaitingForInput()) {
+                int choice = inputManager.getPlayerChoice();
+                if (choice == 1) {
+                    currentPlayer->PurchaseHotel(street);
+                    inputManager.setWaitingForInput(false);
+                } else if (choice == 2) {
+                    inputManager.setWaitingForInput(false);
+                }
+            }
         }
     }
-    else
-    {
-        if(!street->getHasHotel())
-        {
-        int ans2;
-        std::cout << "would you like to upgrade and purchase an hotel on this street?" << std::endl;
-        std::cin >> ans2;
-        if(ans2 ==1)
-        {
-            currentPlayer->PurchaseHotel(street);
-
-        }
-        }
-    
-    }
-
 }
 
- bool MonopolManager::ChargePlayer(std::shared_ptr<Player>& src,std::shared_ptr<Player>& dst,float amount)
- {
+
+ bool MonopolManager::ChargePlayer(std::shared_ptr<Player>& src, std::shared_ptr<Player>& dst, float amount, sf::Text& gameMessage) {
     bool isValidTransfer = true;
-    std::cout << "Transfer: " <<  amount  <<"₪ From "<< src->getName() << " To "<< dst->getName() << std::endl;
-    std::cout << "Charging ..." << std::endl;
-    if(src->getMoney() < amount)
-    {
+    std::ostringstream messageStream;
+
+    messageStream << "Transfer: " << amount << "₪ From " << src->getName() << " To " << dst->getName() << "\n";
+    messageStream << "Charging ...\n";
+
+    if (src->getMoney() < amount) {
         src->setIsBankrupt(true);
-        TransferAllProperties(src,dst);
-        isValidTransfer =false;
-    }
-    else
-    {
+        TransferAllProperties(src, dst);
+        messageStream << src->getName() << " is bankrupt! All properties have been transferred.\n";
+        isValidTransfer = false;
+    } else {
         src->changeMoney(-amount);
         dst->changeMoney(amount);
+        messageStream << "Transfer successful! " << src->getName() << " now has " << src->getMoney() << "₪.\n";
     }
 
-    return isValidTransfer;
+    // Update the game message to reflect the results
+    gameMessage.setString(messageStream.str());
 
- }
+    return isValidTransfer;
+}
+
 
  void MonopolManager::TransferAllProperties(std::shared_ptr<Player>& src,std::shared_ptr<Player>& dst)
  {
