@@ -11,7 +11,7 @@ LIBRARY_PATH = "C:\Users\Roi\Documents\Libraries\SFML-2.6.1\lib"
 # Compiler and linker flags
 CXX = g++
 CXXFLAGS = -I$(INCLUDE_PATH) 
-LDFLAGS = -L$(LIBRARY_PATH)  -lsfml-graphics -lsfml-window -lsfml-system -lopengl32 -lfreetype -lwinmm -lgdi32 -mwindows
+LDFLAGS = -L$(LIBRARY_PATH)  -lsfml-graphics -lsfml-window -lsfml-system -lopengl32 -lfreetype -lwinmm -lgdi32 -mwindows -lsfml-audio
 
 # Target for building everything
 all: compile link

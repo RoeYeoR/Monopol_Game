@@ -32,29 +32,38 @@ return -1; // Handle error
 }
 
 //  // Create a music object
-// sf::Music music;
+sf::Music music;
 
-// // Load music from a file (WAV, OGG, or FLAC)
-// if (!music.openFromFile("Audio\\GameMusic.ogg"))
-// {
-//     std::cerr << "Error loading music file\n";
-//     return -1;
-// }
+// Load music from a file (WAV, OGG, or FLAC)
+if (!music.openFromFile("Audio\\GameMusic.ogg"))
+{
+    std::cerr << "Error loading music file\n";
+    return -1;
+}
 
-// // Play the music
-// music.play();
+// Play the music
+music.play();
 
-// // Set music properties (optional)
-// music.setLoop(true); // Set the music to loop
+// Set music properties (optional)
+music.setLoop(true); // Set the music to loop
 
 
 //Get Font
 sf::Font font;
-if (!font.loadFromFile("Fonts\\GameFont2.ttf")) 
+if (!font.loadFromFile("Fonts\\GameFont3.ttf")) 
 { 
 std::cerr << "Error loading font\n"; // Print error message
 return -1; // Handle error
 }
+
+//Get Font
+sf::Font font3;
+if (!font3.loadFromFile("Fonts\\GameFont3.ttf")) 
+{ 
+std::cerr << "Error loading font\n"; // Print error message
+return -1; // Handle error
+}
+
 
 
 
@@ -76,7 +85,7 @@ bool hasPressedOnStatusButton = false;
 // Welcome text
 sf::Text WelcomeText;
 WelcomeText.setFont(font);
-WelcomeText.setCharacterSize(24);
+WelcomeText.setCharacterSize(30);
 WelcomeText.setFillColor(sf::Color::Black);
 WelcomeText.setString("Welcome To Monopl Game");
 
@@ -338,7 +347,7 @@ for (int col = 0; col < boardSize; ++col) {
     // Create and set up the text
     sf::Text text;
     text.setFont(font);
-    text.setCharacterSize(10); // Adjust size as needed
+    text.setCharacterSize(15); // Adjust size as needed
     text.setFillColor(sf::Color::Black); // Text color
 
     // Example text, you can set it to a property of your Square or any other identifier
