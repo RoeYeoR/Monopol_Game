@@ -231,7 +231,7 @@ bool Player::PurchaseElectricCompany(ElectricCompany* electricCompany )
     return true;
 }
 
-bool Player::AddChance()
+Chance* Player::getChance()
 {
   Chance* card = nullptr;
   std::vector<Chance>& originalChanceCards =  MonopolManager::getInstance().getGameChanceCards();
@@ -243,14 +243,26 @@ bool Player::AddChance()
         break;
     }
   }
-  if(card != nullptr)
-  {
-    ChanceCards.push_back(*card);
-    return true;
-  }
-  return false;
+  return card;
    
 }
+
+ Chance* Player::getCommunityChest()
+ {
+    Chance* card = nullptr;
+  std::vector<Chance>& originalChanceCards =  MonopolManager::getInstance().getGameChanceCards();
+  for (Chance& c : originalChanceCards)
+  {
+    if(!c.getWasInUse())
+    {
+        card = &c;
+        break;
+    }
+  }
+  return card;
+
+
+ }
 
  void Player::displayShort(std::ostream& os) const 
  {
@@ -300,9 +312,9 @@ bool Player::AddChance()
 
     std::ostringstream os; 
 
-    os << "Player status: " << "name: " << name << "," << " money: " << money << 
-    ", current Position on board: " << currentPosition << ", Own Electric Company?" << (hasOwnElectricCompany ? " Yes" : " No")
-    <<  ", Own Water Company?" << (hasOwnWaterCompany ? " Yes" : " No") <<std::endl;
+    os << "Player status: " << "name: " << name << "," << " money: " << money << "\n"<<
+    " current Position on board: " << currentPosition << "\n"<<" Own Electric Company?" << (hasOwnElectricCompany ? " Yes" : " No")
+    <<  "\n"<<" Own Water Company?" << (hasOwnWaterCompany ? " Yes" : " No") <<std::endl;
 
     // Loop through all streets and call their display method
     os << "Owned Streets:" << std::endl;
@@ -313,7 +325,7 @@ bool Player::AddChance()
     else{
         
         for (const Street& street : streets) {
-        os << street.display(os); // Call the display method for each street
+        os << street.display(); // Call the display method for each street
         }
 
     }
@@ -327,7 +339,7 @@ bool Player::AddChance()
     else{
     
     for (const Train& train : trains) {
-        os<< train.display(os); // Call the display method for each train
+        os<< train.display(); // Call the display method for each train
     }
 
     os<< "Position On Board: " << currentPosition;

@@ -55,6 +55,20 @@ Board::Board() :board(rows, std::vector<std::shared_ptr<Square>>(cols))
     setSquare(7, 0, std::make_shared<Street>("STATES Ave", 140,Color::Pink,100));
     setSquare(8, 0, std::make_shared<ElectricCompany>("Electric"));
     setSquare(9, 0, std::make_shared<Street>("ST.CHARLES PLACE", 140,Color::Pink,100));
+
+    //store all streets into a vector
+    for (int i = 0; i <rows ; i++)
+    {
+            for (int j = 0; j < cols; j++)
+            {
+                 if (auto street = dynamic_cast<Street*>(board[i][j].get()))
+                 {
+                    totalStreets.push_back(*street);
+                 }
+            }
+            
+    }
+    
     
 }
 
@@ -68,6 +82,12 @@ void Board::setSquare(int x, int y, std::shared_ptr<Square> square)
 std::vector<std::vector<std::shared_ptr<Square>>>& Board::getBoard()
 {
   return board;
+}
+
+
+std::vector<Street>& Board::getTotalStreets()
+{
+    return totalStreets;
 }
 
 
@@ -107,7 +127,6 @@ void Board::offerPlayerOptions(const std::shared_ptr<Square>& square,sf::Text& g
         MonopolManager::getInstance().BuyStreet(street, gameMessage);  // Pass the text object
     } else if (auto tax = dynamic_cast<Tax*>(square.get())) {
         messageStream << "It's a TaxSquare.\n";
-         InputManager::getInstance().setCurrentState(InputState::PayTax);
         MonopolManager::getInstance().CheckTaxPrice(tax,gameMessage);
     } else if (auto chance = dynamic_cast<Chance*>(square.get())) {
         messageStream << "It's a ChanceSquare.\n";
@@ -116,7 +135,7 @@ void Board::offerPlayerOptions(const std::shared_ptr<Square>& square,sf::Text& g
     } else if (auto communityChest = dynamic_cast<CommunityChest*>(square.get())) {
         messageStream << "It's a CommunityChestSquare.\n";
          InputManager::getInstance().setCurrentState(InputState::HandleCommunityChest);
-        MonopolManager::getInstance().AddCommunityChest();
+        MonopolManager::getInstance().AddCommunityChest(gameMessage);
     } else if (auto train = dynamic_cast<Train*>(square.get())) {
         messageStream << "It's a TrainSquare.\n";
          InputManager::getInstance().setCurrentState(InputState::BuyTrain);
@@ -145,9 +164,9 @@ void Board::offerPlayerOptions(const std::shared_ptr<Square>& square,sf::Text& g
 
 void Board::offerPlayerUpgrades(const std::shared_ptr<Square>& square,sf::Text& gameMessage)
 {
-     std::ostringstream messageStream;
+    std::ostringstream messageStream;
     if (auto street = dynamic_cast<Street*>(square.get())) {
-        messageStream << "This Street belongs to you." << std::endl;
+        messageStream << "This Street is already belongs to you." << std::endl;
         MonopolManager::getInstance().UpgradeStreet(street,gameMessage);
     } 
      else {

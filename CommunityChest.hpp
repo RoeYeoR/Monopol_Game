@@ -13,6 +13,6 @@ class CommunityChest :public Square {
         CommunityChest();
         CommunityChest(std::string name);
         void display(std::ostream& os) const override;
-        std::string display(std::ostringstream& os) const override;
+        std::string display() const override;
 
 };

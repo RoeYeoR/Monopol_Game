@@ -8,9 +8,9 @@ void Tax::display(std::ostream& os) const
     os << "Tax: " << name << std::endl;
 }
 
- std::string Tax::display(std::ostringstream& os) const
+ std::string Tax::display() const
 {
-    
+    std::ostringstream os;
      os << "Tax Square: " << name << std::endl;
      return os.str();
 

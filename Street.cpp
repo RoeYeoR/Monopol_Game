@@ -1,9 +1,20 @@
 #include "Street.hpp"
 using namespace std;
 
-Street::Street(std::string name,float price,Color color,float housePrice): Square(name,price)
-,color(color), housePrice(housePrice) {hasHotel = false;}
 
+int Street::count = 0;
+
+Street::Street(std::string name,float price,Color color,float housePrice): Square(name,price)
+,color(color), housePrice(housePrice) ,id(count)
+{ 
+     hasHotel = false;
+     count++;
+}
+
+int Street::getID()
+{
+     return id;
+}
 
 float Street::getRentPrice()
 {
@@ -51,10 +62,15 @@ void Street::display(std::ostream& os) const
     
 }
 
-std::string Street::display(std::ostringstream& os) const
+std::string Street::display() const
 {
-    
-     os <<  "Street name: " << name << "," << "price:" << price <<  "," << "color group:" << color <<std::endl;
+    std::ostringstream os;
+     os <<  "Street name: " << name <<  "\n"<< "price:" << price << "\n"<<  "color group:" << color <<std::endl;
      return os.str();
 
+}
+
+bool Street::operator==(Street& other) const
+{
+     return id == other.getID(); 
 }

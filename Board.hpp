@@ -22,6 +22,7 @@ class Board {
     const int cols = 11;
     //std::vector<std::vector<Square>> board;
     std::vector<std::vector<std::shared_ptr<Square>>> board;
+    std::vector<Street> totalStreets;
     Board();
 
   public:
@@ -35,6 +36,7 @@ class Board {
             return instance;
         }
 
+    std::vector<Street>& getTotalStreets();
     void setSquare(int row, int col, std::shared_ptr<Square> square);
     std::vector<std::vector<std::shared_ptr<Square>>>& getBoard();
 

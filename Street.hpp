@@ -8,9 +8,12 @@
 using namespace std;
 
 
+
+
 class Street : public Square{
 
 private:
+    int id;
     float rentPrice;
     float housePrice;
     float rentPriceWithHouse;
@@ -22,7 +25,7 @@ private:
 
 public:
     Street(std::string name,float price,Color color,float housePrice);
-     // Override display method
+    int getID();
     float getRentPrice();
     float getHousePrice();
     float getRentPriceWithHouse();
@@ -33,8 +36,10 @@ public:
     void addHouse();
     void addHotel();
     void display(std::ostream& os) const override;
-    std::string display(std::ostringstream& os) const;
-
+    std::string display() const;
+    bool operator==(Street& other) const ;
+    
+    static int count;
        
     
 

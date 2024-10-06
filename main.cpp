@@ -95,8 +95,8 @@ InstructionText.setString("Enter number of players (2-8):");
 
 
 sf::FloatRect textBoundsInstruction = InstructionText.getLocalBounds();
-InstructionText.setOrigin(textBoundsInstruction.width / 2, textBoundsInstruction.height / 2); // Center the origin
-InstructionText.setPosition(windowSize.x / 2, windowSize.y / 2); // Position it in the center of the window
+InstructionText.setOrigin(textBoundsInstruction.width / 2 , textBoundsInstruction.height / 2); // Center the origin
+InstructionText.setPosition(windowSize.x / 2, windowSize.y / 2 -50); // Position it in the center of the window
 
 
 // Instruction Space text
@@ -134,7 +134,7 @@ GameMessage2Text.setString("Game Message 2 ...");
 
 sf::FloatRect textBoundsGameMessage2Text = GameMessage2Text.getLocalBounds();
 GameMessage2Text.setOrigin(textBoundsGameMessage2Text.width / 2, textBoundsGameMessage2Text.height / 2); // Center the origin
-GameMessage2Text.setPosition(windowSize.x / 2, windowSize.y / 2 + 250); 
+GameMessage2Text.setPosition(windowSize.x / 2, windowSize.y / 2 + 300); 
 
 
 
@@ -147,7 +147,7 @@ StatusText.setString("Status...");
 
 
 sf::FloatRect textBoundsStatus = StatusText.getLocalBounds();
-StatusText.setOrigin(textBoundsStatus.width / 2, textBoundsStatus.height / 2); // Center the origin
+StatusText.setOrigin(textBoundsStatus.width / 2 , textBoundsStatus.height / 2 ); // Center the origin
 StatusText.setPosition(windowSize.x / 2, windowSize.y / 2 - 200); // Position it in the center of the window
 
 
@@ -214,7 +214,7 @@ for (int i = 0; i < maxNumOfPlayers; i++)
 // Create two buttons: Player Status and Roll the Dice
 sf::RectangleShape playerStatusButton(sf::Vector2f(200.f, 50.f));
 playerStatusButton.setFillColor(sf::Color(100, 100, 250)); // Blue color
-playerStatusButton.setPosition(windowSize.x / 2 - 100, windowSize.y / 2 + 50); // Position in the center
+playerStatusButton.setPosition(windowSize.x / 2 - 100, windowSize.y / 2 + 30); // Position in the center
 
 sf::Text playerStatusText;
 playerStatusText.setFont(font);
@@ -225,7 +225,7 @@ playerStatusText.setPosition(playerStatusButton.getPosition().x + 20, playerStat
 
 sf::RectangleShape rollDiceButton(sf::Vector2f(200.f, 50.f));
 rollDiceButton.setFillColor(sf::Color(100, 250, 100)); // Green color
-rollDiceButton.setPosition(windowSize.x / 2 - 100, windowSize.y / 2 + 120); // Below Player Status button
+rollDiceButton.setPosition(windowSize.x / 2 - 100, windowSize.y / 2 + 100); // Below Player Status button
 
 sf::Text rollDiceText;
 rollDiceText.setFont(font);
@@ -426,6 +426,7 @@ while (window.pollEvent(event))
               
             }
                 MonopolManager::getInstance().setCurrentPlayer(players[currentPlayerIndex]);
+                MonopolManager::getInstance().setPlayers(players);
                 InstructionText.setString("Players have been placed on the start square.");
             } 
             else 
@@ -462,13 +463,22 @@ while (window.pollEvent(event))
                 if(hasPressedOnStatusButton)
                 {
                      std::string statusStr =  players[currentPlayerIndex]->displayLong();
+                     
                      StatusText.setString(statusStr);
-                     playerStatusText.setString("Hide Status");
+                    sf::FloatRect textBoundsStatus = StatusText.getLocalBounds();
+                    StatusText.setOrigin(textBoundsStatus.width / 2 , textBoundsStatus.height / 2 ); // Center the origin
+                    StatusText.setPosition(windowSize.x / 2, windowSize.y / 2 -200 ); // Position it in the center of the window
+                    playerStatusText.setString("Hide Status");
+                    InstructionText.setString("");
+                    WelcomeText.setString("");
+                    StatusPlayerTurnText.setString("");
                 }
                 else
                 {
-                     StatusText.setString("");
-                     playerStatusText.setString("Status");
+                    WelcomeText.setString("Welcome To Monopl Game");
+                    StatusPlayerTurnText.setString("Player " +std::to_string(currentPlayerIndex+1) +"'s Turn");
+                    StatusText.setString("");
+                    playerStatusText.setString("Status");
                 }            
             }
 
@@ -477,18 +487,27 @@ while (window.pollEvent(event))
             {
                 // Roll the dice
                 int diceResult = MonopolManager::getInstance().RollDice();
-                InstructionText.setString("You rolled a " + std::to_string(diceResult) + "!");
+                
+                
+                InstructionText.setString("You rolled  " + std::to_string(diceResult) + "!");
+                sf::FloatRect textBoundsInstruction = InstructionText.getLocalBounds();
+                InstructionText.setOrigin(textBoundsInstruction.width / 2 , textBoundsInstruction.height / 2); // Center the origin
+                InstructionText.setPosition(windowSize.x / 2, windowSize.y / 2 ); // Position it in the center of the window
+
                 players[currentPlayerIndex]->MoveOnBoard(diceResult);
                 Point2D& currentPos =  players[currentPlayerIndex]->getCurrentPosition();
-                std::string newPosStr = "Position On Board: " + currentPos.to_string();
-                StatusText.setString(newPosStr);
+                std::ostringstream newPosStr; 
+                newPosStr << "Position On Board: " << currentPos.to_string() << "\n" << "Current Square: " <<board[currentPos.getX()][currentPos.getY()]->display();
+                StatusText.setOrigin(textBoundsStatus.width / 2 +250 , textBoundsStatus.height / 2 );
+                StatusText.setString(newPosStr.str());
+                
                 std::shared_ptr<Player>* p = Board::getInstance().checkSquareOwnerShip(board[currentPos.getX()][currentPos.getY()]);
                 std::ostringstream os;   
 
             if (currentPos.getX() >= 0 && currentPos.getX() < 11 && currentPos.getY() >= 0 && currentPos.getY() < 11)  
             {
-                 if( p == nullptr)
-               {      
+                if( p == nullptr)
+                {      
                          Board::getInstance().offerPlayerOptions(board[currentPos.getX()][currentPos.getY()],GameMessageText);
                 }
                 
@@ -496,7 +515,7 @@ while (window.pollEvent(event))
                {
                     std::shared_ptr<Square>& currentSquare =  board[currentPos.getX()][currentPos.getY()];
         
-                    os << currentSquare->display(os);
+                    os << currentSquare->display();
                     os <<"This Sqaure is owned by " << (*p)->getName();
                     float calculatedPrice = MonopolManager::getInstance().getActuallBillOfSquare(currentSquare,p);  
                 
@@ -527,7 +546,12 @@ while (window.pollEvent(event))
 
             else
             {
-                InstructionText.setString("You already did your Turn. Press Space to move on to the next Player !");
+                if(hasDoneTurn)
+                {
+                     InstructionText.setString("You already did your Turn. Press Space to move on to the next Player !");
+                     InstructionText.setOrigin(textBoundsInstruction.width / 2 + 200 , textBoundsInstruction.height / 2); // Center the origin
+                }
+               
             }
                 
         }
@@ -580,12 +604,14 @@ switch (InputManager::getInstance().getCurrentState()) {
         {
             
             GameMessageText.setString("You chose to buy this street !:)");
+             GameMessageText.setOrigin(textBoundsGameMessageText.width / 2 + 200, textBoundsGameMessageText.height / 2);
             Point2D& currentPos= players[currentPlayerIndex]->getCurrentPosition();
             auto street = dynamic_cast<Street*>(board[currentPos.getX()][currentPos.getY()].get());
              if (players[currentPlayerIndex]->PurchaseStreet(street)) {
                  std::ostringstream messageStream;                
                 messageStream << "Street: " << street->name << " was purchased successfully!\n";
                 GameMessage2Text.setString(messageStream.str());
+                GameMessage2Text.setOrigin(textBoundsGameMessage2Text.width / 2 + 200, textBoundsGameMessage2Text.height / 2);
                 
             }
 
@@ -603,9 +629,6 @@ switch (InputManager::getInstance().getCurrentState()) {
         }
         break;
 
-    case InputState::PayTax:
-        // Logic for PayTax state
-        break;
 
     case InputState::BuyTrain:
         // Logic for BuyTrain state
@@ -613,6 +636,7 @@ switch (InputManager::getInstance().getCurrentState()) {
         {
             
             GameMessageText.setString("You chose to buy this train !:)");
+            GameMessageText.setOrigin(textBoundsGameMessageText.width / 2 + 200, textBoundsGameMessageText.height / 2);
             Point2D& currentPos= players[currentPlayerIndex]->getCurrentPosition();
             auto train = dynamic_cast<Train*>(board[currentPos.getX()][currentPos.getY()].get());
             if (players[currentPlayerIndex]->PurchaseTrain(train)) {
@@ -638,11 +662,103 @@ switch (InputManager::getInstance().getCurrentState()) {
 
     case InputState::BuyWaterCompany:
         // Logic for BuyWaterCompany state
+           if (InputManager::getInstance().getPlayerChoice() == 1)
+        {
+            
+            GameMessageText.setString("You chose to buy the water company !:)");
+            Point2D& currentPos= players[currentPlayerIndex]->getCurrentPosition();
+            auto waterCompany = dynamic_cast<WaterCompany*>(board[currentPos.getX()][currentPos.getY()].get());
+            if (players[currentPlayerIndex]->PurchaseWaterCompany(waterCompany)) {
+                std::ostringstream messageStream;                
+                messageStream <<  waterCompany->name << " was purchased successfully!\n";
+                GameMessage2Text.setString(messageStream.str());
+                GameMessage2Text.setOrigin(textBoundsGameMessage2Text.width / 2 + 200, textBoundsGameMessage2Text.height / 2);
+                
+            }
+
+              InputManager::getInstance().reset();
+
+        }
+
+        if (InputManager::getInstance().getPlayerChoice() == 2)
+        {
+            GameMessageText.setString("");
+            GameMessage2Text.setString("You chose not to buy the water company... go on to the next player !");
+            InputManager::getInstance().reset();
+
+
+        }
         break;
 
     case InputState::BuyElectricCompany:
         // Logic for BuyElectricCompany state
+             if (InputManager::getInstance().getPlayerChoice() == 1)
+        {
+            
+            GameMessageText.setString("You chose to buy the electric company !:)");
+            Point2D& currentPos= players[currentPlayerIndex]->getCurrentPosition();
+            auto electricCompany = dynamic_cast<ElectricCompany*>(board[currentPos.getX()][currentPos.getY()].get());
+            if (players[currentPlayerIndex]->PurchaseElectricCompany(electricCompany)) {
+                std::ostringstream messageStream;                
+                messageStream <<  electricCompany->name << " was purchased successfully!\n";
+                GameMessage2Text.setString(messageStream.str());
+                
+            }
+
+              InputManager::getInstance().reset();
+
+        }
+
+        if (InputManager::getInstance().getPlayerChoice() == 2)
+        {
+            GameMessageText.setString("");
+            GameMessage2Text.setString("You chose not to buy the electric company... go on to the next player !");
+            InputManager::getInstance().reset();
+
+
+        }
         break;
+
+
+    case InputState::UpgradeStreet:
+    // Logic for HandleChance state
+     if (InputManager::getInstance().getPlayerChoice() == 1)
+        {
+            
+            GameMessageText.setString("You chose to upgrade this street !:)");
+            Point2D& currentPos= players[currentPlayerIndex]->getCurrentPosition();
+            auto street = dynamic_cast<Street*>(board[currentPos.getX()][currentPos.getY()].get());
+            bool isValid = MonopolManager::getInstance().CheckAddingHouseValidabilty(street);
+             if(isValid)
+             {
+                if (players[currentPlayerIndex]->PurchaseHouse(street)) 
+                {
+                std::ostringstream messageStream;                
+                messageStream << "Street: " << street->name << " was upgraded successfully!\n";
+                GameMessage2Text.setString(messageStream.str());
+                
+                }
+
+             }
+             else{
+                GameMessage2Text.setString("You still can not buy an house on this street \n  You need to buy all streets on the same color before that action ... ");
+
+             }
+             
+              InputManager::getInstance().reset();
+
+        }
+
+        if (InputManager::getInstance().getPlayerChoice() == 2)
+        {
+            GameMessageText.setString("");
+            GameMessage2Text.setString("You chose not to upgrade this Street... go on to the next player !");
+            InputManager::getInstance().reset();
+
+
+        }
+
+    break;
 
     case InputState::HandleChance:
         // Logic for HandleChance state

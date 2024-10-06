@@ -14,8 +14,9 @@ void Chance::display(std::ostream& os) const
     os << "Chance: " << name << std::endl;
 }
 
-std::string Chance::display(std::ostringstream& os) const
+std::string Chance::display() const
 {
+    std::ostringstream os;
     os << "Chance: " << name << std::endl;
     return os.str();
 }

@@ -49,6 +49,11 @@ std::vector<std::shared_ptr<Player>>&  MonopolManager::getPlayers()
     return players;
 }
 
+void MonopolManager::setPlayers(std::vector<std::shared_ptr<Player>>& players)
+{
+    players = players;
+}
+
 
 std::shared_ptr<Player>& MonopolManager::getCurrentPlayer()
  {
@@ -173,9 +178,10 @@ void MonopolManager::CheckTaxPrice(Tax* tax, sf::Text& gameMessage) {
 
  void MonopolManager::AddChance(sf::Text& gameMessage) {
     std::ostringstream messageStream;
-
-    if (currentPlayer->AddChance()) {
-        messageStream << "A chance card was added successfully!\n";
+    Chance* card = currentPlayer->getChance();
+    if (card != nullptr) {
+        messageStream << "A chance card was taken successfully!\n";
+        messageStream<< "Chance Card Description: " << card->display();
     } else {
         messageStream << "Couldn't add a chance card...\n";
     }
@@ -185,9 +191,19 @@ void MonopolManager::CheckTaxPrice(Tax* tax, sf::Text& gameMessage) {
 }
 
 
- void MonopolManager::AddCommunityChest()
+ void MonopolManager::AddCommunityChest(sf::Text& gameMessage)
  {
+ std::ostringstream messageStream;
+    Chance* card = currentPlayer->getCommunityChest();
+    if (card != nullptr) {
+        messageStream << "A CommunityChest card was taken successfully!\n";
+         messageStream<< "Chance Card Description: " << card->display();
+    } else {
+        messageStream << "Couldn't add a chance card...\n";
+    }
 
+    // Update the game message to reflect the results
+    gameMessage.setString(messageStream.str());
 
  }
 
@@ -450,10 +466,18 @@ void MonopolManager::UpgradeStreet(Street* street, sf::Text& gameMessage)
     InputManager& inputManager = InputManager::getInstance();
 
     if (street->getNumOfHouses() < 4) {
-        messageStream << "Would you like to upgrade and purchase another house on this street? 1. Yes, 2. No\n";
+        if(street->getNumOfHouses()==0)
+        {
+            messageStream << "Would you like to upgrade and purchase an house on this street? 1. Yes, 2. No\n";
+        }
+        else
+        {
+            messageStream << "Would you like to upgrade and purchase another house on this street? 1. Yes, 2. No\n";
+        }
+      
         gameMessage.setString(messageStream.str());
 
-        inputManager.setCurrentState(InputState::None); // Reset the state after setting message
+        inputManager.setCurrentState(InputState::UpgradeStreet); // Reset the state after setting message
         inputManager.setWaitingForInput(true);
 
         // Check for player input
@@ -617,6 +641,39 @@ void MonopolManager::UpgradeStreet(Street* street, sf::Text& gameMessage)
     }
     return true;
  }
+
+ bool MonopolManager::CheckAddingHouseValidabilty(Street* street)
+ {
+    int totalSameColorStreets = getTotalSameColorStreets(street->getColor());
+    int counter = 0;
+
+    for(Street& st : currentPlayer->getStreets())
+    {
+        if(st.getColor() == street->getColor())
+        {
+            counter++;
+        }
+    }
+
+    return (counter==totalSameColorStreets);
+
+ }
+
+  int MonopolManager::getTotalSameColorStreets(Color color)
+  {
+        int counter=0;
+        for(Street& st : Board::getInstance().getTotalStreets() )
+        {
+            if(st.getColor() == color)
+            {
+                counter++;
+            }
+
+        }
+
+        return counter;
+
+  }
 
   void MonopolManager::SetIcon(std::shared_ptr<Square>& square, const std::string& iconName) {
         // Check if texture is already loaded

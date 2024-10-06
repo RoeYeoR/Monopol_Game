@@ -43,6 +43,7 @@ class MonopolManager{
         std::shared_ptr<Player> currentPlayer;
        
        
+       
         MonopolManager();
 
     public:
@@ -59,6 +60,7 @@ class MonopolManager{
         static float StartMoney;
 
         std::vector<std::shared_ptr<Player>>& getPlayers();
+        void setPlayers(std::vector<std::shared_ptr<Player>>& players);
         std::shared_ptr<Player>& getCurrentPlayer();
         void setCurrentPlayer(std::shared_ptr<Player>& p);
         std::vector<Chance>& getGameChanceCards();
@@ -69,7 +71,7 @@ class MonopolManager{
         std::shared_ptr<Player>* CheckElectricCompanyOwner(const std::shared_ptr<Square>& square);
         void CheckTaxPrice(Tax* tax, sf::Text& gameMessage);
         void AddChance(sf::Text& gameMessage);
-        void AddCommunityChest();
+        void AddCommunityChest(sf::Text& gameMessage);
         float getActuallBillOfSquare(std::shared_ptr<Square>& square,std::shared_ptr<Player>* ownPlayer);
         void BuyStreet(Street* street, sf::Text& gameMessage);
         void BuyTrain(Train* train, sf::Text& gameMessage);
@@ -83,7 +85,9 @@ class MonopolManager{
         bool DeleteAllProperties();
         void GoToJail();
         void GrantPlayerMoney(float sum);
+        int getTotalSameColorStreets(Color color);
         bool areAllRestPlayersHaveBankRupt(std::shared_ptr<Player>& p);
+        bool CheckAddingHouseValidabilty(Street* street);
         std::shared_ptr<Player>* CheckIsWinner();
         void SetIcon(std::shared_ptr<Square>& square, const std::string& iconName);
 

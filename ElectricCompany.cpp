@@ -9,8 +9,9 @@ void ElectricCompany::display(std::ostream& os) const
     os << name << std::endl;
 }
 
-std::string ElectricCompany::display(std::ostringstream& os) const
+std::string ElectricCompany::display() const
 {
+    std::ostringstream os;
     os << name << std::endl;
     return os.str();
 }

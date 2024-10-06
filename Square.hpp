@@ -22,10 +22,10 @@
         sf::Sprite getIcon() {return iconSprite;}
         
         virtual void display(std::ostream& os) const = 0;  
-        virtual std::string display(std::ostringstream& os) const =0 ; 
+        virtual std::string display() const =0 ; 
         virtual ~Square() = default;       // Virtual destructor for proper cleanup
 
-        bool operator==(const Square& other) const
+        virtual bool operator==(const Square& other) const
         {
             return name == other.name;
         }

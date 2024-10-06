@@ -10,7 +10,7 @@ class Train : public Square{
     public:
       Train(std::string name); 
       virtual void display(std::ostream& os) const override;
-      std::string display(std::ostringstream& os) const;
+      std::string display() const;
       static int count;
 
 

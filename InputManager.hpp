@@ -4,13 +4,13 @@
 enum class InputState {
     None,
     BuyStreet,
-    PayTax,
     BuyTrain,
     BuyWaterCompany,
     BuyElectricCompany,
     HandleChance,
     HandleCommunityChest,
     EdgeSquare,
+    UpgradeStreet,
     // Add other states as needed
 };
 

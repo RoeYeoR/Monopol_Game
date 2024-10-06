@@ -14,9 +14,9 @@
 
  }
 
- std::string Train::display(std::ostringstream& os) const
+ std::string Train::display() const
 {
-    
+    std::ostringstream os;
      os << "Train Square: " << name << std::endl;
      return os.str();
 

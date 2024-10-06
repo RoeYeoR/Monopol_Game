@@ -48,7 +48,8 @@ class Player{
         std::vector<Chance>& getChanceCards();
         const bool gethasOwnWaterCompany() const;
         const bool gethasOwnElectricCompany() const;
-        bool AddChance();
+        Chance* getChance();
+       Chance* getCommunityChest();
         bool PurchaseStreet(Street* street);
         bool PurchaseTrain(Train* train);
         bool PurchaseHouse(Street* street);
