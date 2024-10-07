@@ -518,6 +518,9 @@ while (window.pollEvent(event))
 
                 players[currentPlayerIndex]->MoveOnBoard(diceResult);
                 Point2D& currentPos =  players[currentPlayerIndex]->getCurrentPosition();
+
+                playerIcons[currentPlayerIndex].setPosition(currentPos.getY()*cellWidth , currentPos.getX()*cellHeight );
+
                 std::ostringstream newPosStr; 
                 newPosStr << "Position On Board: " << currentPos.to_string() << "\n" << "Current Square: " <<board[currentPos.getX()][currentPos.getY()]->display();
                 StatusText.setOrigin(textBoundsStatus.width / 2 +250 , textBoundsStatus.height / 2 );
