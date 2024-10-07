@@ -210,11 +210,11 @@ noButton.setFillColor(sf::Color::Red);
 
 
 
-
+sf::Texture playerTexture;
 for (int i = 0; i < maxNumOfPlayers; i++)
 {
-    sf::Texture playerTexture;
-    if (!playerTexture.loadFromFile("Icons\\Player" + std::to_string(i+1) + ".png")) 
+   
+    if (!playerTexture.loadFromFile("Icons\\Player" + std::to_string((i+1)) + ".png")) 
     {
         std::cerr << "Error loading player texture " << "\n";
         return -1; // Handle error
@@ -402,51 +402,61 @@ while (window.pollEvent(event))
             {
                 isNumPlayersEntered = true;
 
-            // Constants for the starting square position
-            const float startX = 10 * cellWidth;
-            const float startY = 10 * cellHeight;
+            const float scaleFactor = (numPlayers <= 4) ? 0.2f : 0.15f; 
 
-            // Calculate dimensions based on the number of players
-            const float spacingX = cellWidth / (numPlayers <= 4 ? 2 : 4);  // Adjust spacing based on players
-            const float spacingY = cellHeight / (numPlayers <= 4 ? 2 : 4); // Adjust spacing based on players
+                    // Define the start square coordinates and dimensions
+        float startX = 10.0f * cellWidth;  // X position of the start square
+        float startY = 10.0f * cellHeight;  // Y position of the start square
+        float startSquareWidth = cellWidth;  // Width of the start square
+        float startSquareHeight = cellHeight; // Height of the start square
 
-            const float scaleFactor = (numPlayers <= 4) ? 0.5f : 0.3f; 
+        // Calculate number of rows and columns based on the number of players
+        int numRows = (numPlayers <= 4) ? 2 : 3; // 2 rows for up to 4 players, 3 for more
+        int numCols = (numPlayers <= 4) ? 2 : 3; // 2 columns for up to 4 players, 3 for more
 
-            // Generate player icons
-            for (int i = 0; i < numPlayers; ++i)
-            {
-                
-                std::shared_ptr<Player> p = std::make_shared<Player>("Player " + std::to_string(i + 1));
-                players.push_back(p);
+        // Calculate cell width and height based on the start square size and number of rows/cols
+        float cellStartWidth = startSquareWidth / numCols;   // Width of each cell in the start square
+        float cellStartHeight = startSquareHeight / numRows; // Height of each cell in the start square
 
+        // Generate player icons
+        for (int i = 0; i < numPlayers; ++i)
+        {
+            // Create a new player and add it to the players vector
+            std::shared_ptr<Player> p = std::make_shared<Player>("Player " + std::to_string(i + 1));
+            players.push_back(p);
 
-               sf::Sprite playerSprite;
-               playerSprite.setTexture(playerTextures[i]);
+            // Create and configure the sprite for the player
+            sf::Sprite playerSprite;
+            playerSprite.setTexture(playerTextures[i]);
+            
+            // Set the icon size and scale
+            float playerIconSize = std::min(cellStartWidth, cellStartHeight) * 3; // Adjust size as needed
+            playerSprite.setScale(playerIconSize / playerSprite.getTexture()->getSize().x,
+                                playerIconSize / playerSprite.getTexture()->getSize().y);
 
+            // Calculate position based on row and column indices
+            int row = i / numCols; // Integer division gives the row index
+            int col = i % numCols; // Modulo gives the column index
 
-                playerSprite.setScale(scaleFactor, scaleFactor);
-                
-                // Calculate positions to spread the icons in the starting square
-                float offsetX = (i % 2 == 0) ? -spacingX : spacingX; 
-                float offsetY = (i < 2) ? -spacingY : spacingY;
+            // Set the position of the player icon within the starting square
+            playerSprite.setPosition(
+                startX + col * cellStartWidth + (cellStartWidth - playerSprite.getGlobalBounds().width) / 2,
+                startY + row * cellStartHeight + (cellStartHeight - playerSprite.getGlobalBounds().height) / 2
+            );
 
-                // Set the position of the player icon based on offsets
-                playerSprite.setPosition(startX + offsetX, startY + offsetY);
-
-                // Add player icon to vector
-                playerIcons.push_back(playerSprite);
-              
-            }
-                MonopolManager::getInstance().setCurrentPlayer(players[currentPlayerIndex]);
-                MonopolManager::getInstance().setPlayers(players);
-                InstructionText.setString("Players have been placed on the start square.");
-            } 
-            else 
-            {
-                    input = ""; // Reset invalid input
-                    playerInputText.setString(input);
-                    InstructionText.setString("Please enter a valid number (2-8):");
-            }
+            // Add the sprite to the playerIcons vector
+            playerIcons.push_back(playerSprite);
+        }
+            MonopolManager::getInstance().setCurrentPlayer(players[currentPlayerIndex]);
+            MonopolManager::getInstance().setPlayers(players);
+            InstructionText.setString("Players have been placed on the start square.");
+        } 
+        else 
+        {
+                input = ""; // Reset invalid input
+                playerInputText.setString(input);
+                InstructionText.setString("Please enter a valid number (2-8):");
+        }
 
         }
     }
@@ -834,16 +844,22 @@ window.draw(playerInputText);
 if (isNumPlayersEntered)
 {
 
+// Draw the player icons after placement
+for (int i=0; i<playerIcons.size();i++) 
+{
+    if (playerIcons[i].getTexture()) // Ensure the sprite has a valid texture
+    {
+        window.draw(playerIcons[i]); // Draw the sprite to the window
+    }
+}
+
+
 window.draw(playerStatusButton);
 window.draw(playerStatusText);
 window.draw(rollDiceButton);
 window.draw(rollDiceText);
 
-// Draw the player icons after placement
-for (sf::Sprite& icon : playerIcons)
-{
-    window.draw(icon);
-}
+
 
 }
 
