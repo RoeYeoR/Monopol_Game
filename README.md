@@ -165,11 +165,7 @@ This Monopoly game was created as a final project for Systems Programming 2 cour
 
 </div>
 
-## 📄 License
 
-<div align="center">
-
-This project is for educational purposes only.
 
 <hr>
 
